@@ -25,6 +25,7 @@ module Style exposing
     , mainColumnPhone
     , mainColumnX
     , makeGrey
+    , multiline
     , myFocusStyle
     , navBar
     , navBarPhone
@@ -370,4 +371,15 @@ inputStyle w =
     , Font.color black
     , Font.size 12
     , Border.width 2
+    ]
+
+
+multiline w h =
+    [ width (px w)
+    , height (px h)
+    , Background.color (makeGrey 0.8)
+    , Font.color black
+    , Font.size 12
+    , Border.width 2
+    , scrollbarY
     ]

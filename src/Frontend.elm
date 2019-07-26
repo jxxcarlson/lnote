@@ -649,16 +649,26 @@ masterView model =
         , row []
             [ noteListPanel model
             , viewNote model.currentNote
-
-            -- , notePanel model
-            ]
-        , column [ spacing 12 ]
-            [ row [ spacing 12 ] [ newNoteButton, inputNewNoteName model ]
-            , row [ spacing 12 ]
-                [ el [] (text "controls")
-                ]
+            , newNotePanel model
             ]
         ]
+
+
+newNotePanel model =
+    column [ spacing 12, paddingXY 20 0 ]
+        [ row [ spacing 12 ] [ newNoteButton, inputNewNoteName model ]
+        , inputNoteBody model
+        ]
+
+
+inputNoteBody model =
+    Input.multiline (Style.multiline 300 410)
+        { onChange = GotNoteBody
+        , text = model.noteBody
+        , placeholder = Nothing
+        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
+        , spellcheck = False
+        }
 
 
 deleteNoteControls model =
@@ -750,7 +760,7 @@ viewNotes model =
                   }
                 ]
             }
-        , row [ spacing 24, alignBottom, alignRight ]
+        , row [ spacing 24, alignBottom, alignLeft ]
             [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
             ]
         ]
@@ -771,24 +781,8 @@ idLabel model =
 
 
 --
--- VIEWEVENTS
+-- VIEW NOTE
 --
-
-
-notePanel : Model -> Element FrontendMsg
-notePanel model =
-    case model.maybeCurrentNote of
-        Nothing ->
-            Element.none
-
-        Just currentNote ->
-            let
-                notes =
-                    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
-            in
-            column [ Font.size 12, spacing 36, moveRight 40, width (px 400) ]
-                [ newNotePanel 350 model
-                ]
 
 
 noteNotePanel model =
@@ -810,22 +804,6 @@ noteNotePanel model =
 --
 --
 --
-
-
-newNotePanel : Int -> Model -> Element FrontendMsg
-newNotePanel w model =
-    column [ spacing 24, width (px w) ]
-        [ row [ Border.width 1, padding 12, spacing 12, width (px 300) ] [ submitNoteButton, inputNoteBody model ]
-        ]
-
-
-inputNoteBody model =
-    Input.text (Style.inputStyle 200)
-        { onChange = GotNoteBody
-        , text = model.noteBody
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
 
 
 submitNoteButton : Element FrontendMsg
@@ -871,7 +849,7 @@ newNote model =
             Just <|
                 { id = -1
                 , subject = model.newNoteName
-                , body = ""
+                , body = model.noteBody
                 , timeCreated = now
                 , timeModified = now
                 , tags = []
