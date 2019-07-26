@@ -18,6 +18,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
+import Html.Attributes as HA
 import Lamdera.Frontend as Frontend
 import Lamdera.Types exposing (..)
 import Markdown
@@ -587,7 +588,7 @@ header model =
         ]
         [ showIf (currentUserIsAdmin model) (adminModeButton model)
         , userValidationModeButton model
-        , el [ centerX, Font.size 18, Font.color Style.white ] (text <| "Time Note" ++ currentUserName model)
+        , el [ centerX, Font.size 18, Font.color Style.white ] (text <| currentUserName model ++ ": Notes")
         ]
 
 
@@ -744,7 +745,7 @@ viewNotes model =
                   , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| note.timeCreated)
                   }
                 , { header = el [ Font.bold ] (text "Subject")
-                  , width = px 180
+                  , width = px 170
                   , view = \k note -> selectNoteButton note
                   }
                 ]
@@ -936,8 +937,7 @@ viewNote maybeNote =
 
         Just note ->
             column [ padding 20, spacing 12, height (px 450), width (px 350), Border.width 1 ]
-                [ el [ Font.size 12, Font.bold ] (text note.subject)
-                , Element.paragraph [ Font.size 12 ] [ text note.body ]
+                [ toMarkdown note.body |> Element.html
                 ]
 
 
@@ -945,17 +945,17 @@ filterPanel model =
     row [ spacing 8 ]
         [ el [ Font.bold ] (text "Filter:")
         , inputNoteNameFilter model
-        , row [ spacing 8 ]
-            [ el [ Font.bold, Font.size 14 ] (text "After")
-            , displayShiftedDate model.noteCameAfterString model.currentTime
-            ]
-        , inputNoteCameAfterFilter model
-        , row [ spacing 8 ]
-            [ el [ Font.bold, Font.size 14 ] (text "Before")
-            , displayShiftedDate model.noteCameBeforeString model.currentTime
-            ]
-        , inputNoteCameBeforeFilter model
 
+        -- , row [ spacing 8 ]
+        --     [ el [ Font.bold, Font.size 14 ] (text "After")
+        --     , displayShiftedDate model.noteCameAfterString model.currentTime
+        --     ]
+        -- , inputNoteCameAfterFilter model
+        -- , row [ spacing 8 ]
+        --     [ el [ Font.bold, Font.size 14 ] (text "Before")
+        --     , displayShiftedDate model.noteCameBeforeString model.currentTime
+        --     ]
+        -- , inputNoteCameBeforeFilter model
         --, row [ alignRight, moveRight 36, spacing 12 ] [ editModeButton sharedState model, noteModeButton model ]
         ]
 
@@ -1052,9 +1052,19 @@ myOptions =
     }
 
 
+markdownStyle =
+    [ HA.style "font-size" "14px"
+    , HA.style "width" "300px"
+    , HA.style "overflow-y" "scroll"
+    , HA.style "white-space" "normal"
+
+    -- , HA.style "p" "display: inline-block"
+    ]
+
+
 toMarkdown : String -> Html FrontendMsg
 toMarkdown userInput =
-    Markdown.toHtmlWith myOptions [] userInput
+    Markdown.toHtmlWith myOptions markdownStyle userInput
 
 
 

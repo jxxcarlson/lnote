@@ -30,11 +30,42 @@ n1 : Note
 n1 =
     { id = 1
     , subject = "AAA"
-    , body = "This is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test."
+    , body = someText ++ moreText
     , tags = [ "foo", "bar" ]
     , timeCreated = Time.millisToPosix 1563424248000
     , timeModified = Time.millisToPosix 1563424248000
     }
+
+
+someText =
+    """
+## AAA: a Test
+
+[New York Times](http://nytimes.com)
+
+This is a test. **I repeat:** this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test.
+I repeat: this is a test. I repeat: this is a test.
+I repeat: this is a test. I repeat: this is a test.
+I repeat: this is a test. I repeat: this is a test.
+I repeat: this is a test. I repeat: this is a test.
+
+"""
+
+
+moreText =
+    """
+
+
+I repeat: this is a test. I repeat: this is a test.
+
+I repeat: this is a test. I repeat: this is a test.
+
+I repeat: this is a test. I repeat: this is a test.
+
+I repeat: this is a test. I repeat: this is a test.
+
+I repeat: this is a test. I repeat: this is a test.
+"""
 
 
 n2 : Note
