@@ -9,7 +9,7 @@ import Msg exposing (..)
 import Note exposing (Note)
 import Set exposing (Set)
 import TestData exposing (passwordDict, userDict)
-import User exposing (PasswordDict, User, UserInfo, Username)
+import User exposing (PasswordDict, User, UserDict, UserInfo, Username)
 import UserData
 
 

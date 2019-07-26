@@ -25,8 +25,11 @@ type ToBackend
     | SendSignInInfo String String
     | SendSignUpInfo String String String
     | SendChangePasswordInfo User.Username String String
-    | GetUserStats
     | CreateNote (Maybe User) Note
+    | RequestNotes (Maybe User)
+    | DeleteNote (Maybe User) Note
+    | UpdateNote (Maybe User) Note
+    | SendNoteToBackend (Maybe User) Note
 
 
 type ToFrontend
@@ -64,19 +67,15 @@ type FrontendMsg
     | ChangeUrl Url
     | ClickLink UrlRequest
       -- NOTES
-    | RequestNotes (Maybe User)
     | GotChangedNoteName String
+    | GotNoteBody String
     | GotNewNoteName String
     | DeleteCurrentNote
-    | DeleteNote (Maybe User) Note
     | MakeNewNote
     | GotNoteDateBeforeFilter String
     | GotNoteDateAfterFilter String
     | GotNoteFilter String
-
-
-
---| SetDeleteNoteSafety DeleteNoteSafety
+    | SetDeleteNoteSafety DeleteNoteSafety
 
 
 type AppMode

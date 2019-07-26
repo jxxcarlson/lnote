@@ -61,6 +61,7 @@ type alias Model =
     { input : String
     , appMode : AppMode
     , message : String
+    , currentTime : Posix
 
     -- USER
     , currentUser : Maybe User
@@ -72,8 +73,12 @@ type alias Model =
     , userList : List User
 
     -- NOTES
-    , noteList : List Note
+    , notes : List Note
+    , newNoteName : String
+    , changedNoteName : String
     , deleteNoteSafety : DeleteNoteSafety
+    , noteBody : String
+    , noteFilterString : String
     , noteCameBeforeString : String
     , noteCameAfterString : String
     , maybeCurrentNote : Maybe Note
@@ -90,12 +95,11 @@ initialModel =
     { input = "App started"
     , message = "Please sign in"
     , appMode = UserValidation SignInState
+    , currentTime = Time.millisToPosix 0
 
     -- ADMIN
-    , userStats = Dict.empty
-
-    -- USER
-    , currentUser = Nothing
+    , -- USER
+      currentUser = Nothing
     , username = ""
     , password = ""
     , newPassword1 = ""
@@ -104,7 +108,12 @@ initialModel =
     , userList = []
 
     -- NOTES
-    , noteList = []
+    , notes = []
+    , maybeCurrentNote = Nothing
+    , noteBody = ""
+    , newNoteName = ""
+    , changedNoteName = ""
+    , noteFilterString = ""
     , deleteNoteSafety = DeleteNoteSafetyOn
     , noteCameBeforeString = ""
     , noteCameAfterString = ""
@@ -166,6 +175,9 @@ update msg model =
     case msg of
         NoOpFrontendMsg ->
             ( model, Cmd.none )
+
+        TimeChange t ->
+            ( { model | currentTime = t }, Cmd.none )
 
         -- ADMIN
         SendUsers ->
@@ -307,6 +319,9 @@ update msg model =
 
         GotNewNoteName str ->
             ( { model | newNoteName = str }, Cmd.none )
+
+        GotNoteBody str ->
+            ( { model | noteBody = str }, Cmd.none )
 
         GotChangedNoteName str ->
             ( { model | changedNoteName = str }, Cmd.none )
@@ -627,7 +642,7 @@ masterView model =
         , row []
             [ noteListPanel model
             , eventListDisplay model
-            , eventPanel model
+            , notePanel model
             ]
         , column [ spacing 12 ]
             [ row [ spacing 12 ] [ newNoteButton, inputNewNoteName model ]
@@ -699,83 +714,43 @@ inputNewNoteName model =
 --
 
 
-viewNote : Model -> Element FrontendMsg
-viewNote model =
-    case model.maybeCurrentNote of
-        Nothing ->
-            column [ spacing 12, padding 20, height (px 500) ]
-                [ el [ Font.size 16, Font.bold ] (text "No events available")
+viewNotes : Model -> Element FrontendMsg
+viewNotes model =
+    let
+        today =
+            model.currentTime
+
+        notes =
+            Note.bigDateFilter today model.noteCameBeforeString model.noteCameAfterString model.notes
+    in
+    column [ spacing 12, padding 20, height (px 430) ]
+        [ el [ Font.size 16, Font.bold ] (text "Notes")
+        , indexedTable [ spacing 4, Font.size 12, height (px 400), scrollbarY ]
+            { data = notes
+            , columns =
+                [ { header = el [ Font.bold ] (text <| idLabel model)
+                  , width = px 30
+                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt k)
+                  }
+                , { header = el [ Font.bold ] (text "Date")
+                  , width = px 80
+                  , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| note.timeCreated)
+                  }
+                , { header = el [ Font.bold ] (text "Subject")
+                  , width = px 40
+                  , view = \k note -> el [ Font.size 12 ] (text <| note.subject)
+                  }
                 ]
-
-        Just currentNote ->
-            let
-                today =
-                    model.currentTime
-
-                events2 =
-                    Note.bigDateFilter today model.noteCameBeforeString model.noteCameAfterString currentNote.data
-
-                -- events : List Note
-                -- events =
-                --     Note.groupingFilter model.filterState events2
-                events =
-                    case model.filterState of
-                        NoGrouping ->
-                            events2
-
-                        GroupByDay ->
-                            Note.eventsByDay events2
-
-                eventSum_ =
-                    Note.eventSum events
-
-                nNotes =
-                    List.length events |> toFloat
-
-                average =
-                    TypedTime.multiply (1.0 / nNotes) eventSum_
-            in
-            column [ spacing 12, padding 20, height (px 430) ]
-                [ el [ Font.size 16, Font.bold ] (text (Maybe.map .name model.maybeCurrentNote |> Maybe.withDefault "XXX"))
-                , indexedTable [ spacing 4, Font.size 12, height (px 400), scrollbarY ]
-                    { data = events
-                    , columns =
-                        [ { header = el [ Font.bold ] (text <| idLabel model)
-                          , width = px (indexWidth model.appMode)
-                          , view = indexButton model
-                          }
-                        , { header = el [ Font.bold ] (text "Date")
-                          , width = px 80
-
-                          --, view = \k event -> el [ Font.size 12 ] (text <| dateStringOfDateTimeString <| (\(NaiveDateTime str) -> str) <| event.insertedAt)
-                          , view = \k event -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| event.insertedAt)
-                          }
-                        , { header = el [ Font.bold ] (text "Time")
-                          , width = px 80
-                          , view = \k event -> el [ Font.size 12 ] (text <| DateTime.naiveTimeStringFromPosix <| event.insertedAt)
-                          }
-                        , { header = el [ Font.bold ] (text "Duration")
-                          , width = px 40
-                          , view = \k event -> el [ Font.size 12 ] (text <| TypedTime.timeAsStringWithUnit Minutes event.duration)
-                          }
-                        ]
-                    }
-                , row [ spacing 24, alignBottom, alignRight ]
-                    [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length events))
-                    , el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Average: " ++ TypedTime.timeAsStringWithUnit Minutes average)
-                    , el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Total: " ++ TypedTime.timeAsStringWithUnit Minutes eventSum_)
-                    ]
-                ]
+            }
+        , row [ spacing 24, alignBottom, alignRight ]
+            [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
+            ]
+        ]
 
 
 idLabel : Model -> String
 idLabel model =
-    case model.appMode of
-        Editing ->
-            "id"
-
-        _ ->
-            "idx"
+    "id"
 
 
 
@@ -784,32 +759,19 @@ idLabel model =
 --
 
 
-eventPanel : Model -> Element FrontendMsg
-eventPanel model =
+notePanel : Model -> Element FrontendMsg
+notePanel model =
     case model.maybeCurrentNote of
         Nothing ->
             Element.none
 
         Just currentNote ->
             let
-                events2 =
-                    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString currentNote.data
-
-                events =
-                    case model.filterState of
-                        NoGrouping ->
-                            events2
-
-                        GroupByDay ->
-                            Note.eventsByDay events2
+                notes =
+                    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
             in
             column [ Font.size 12, spacing 36, moveRight 40, width (px 400) ]
-                [ row [ moveLeft 40 ] [ graph model events ]
-                , row [ spacing 16 ]
-                    [ row [ spacing 8 ] [ setMinutesButton model, setHoursButton model ]
-                    , row [ spacing 8 ] [ el [ Font.bold, Font.size 14 ] (text "Group:"), noFilterButton model, filterByDayButton model ]
-                    ]
-                , newNotePanel 350 model
+                [ newNotePanel 350 model
                 ]
 
 
@@ -820,24 +782,12 @@ noteNotePanel model =
 
         Just evt ->
             column [ width (px 300), height (px 450), padding 12, Border.width 1, spacing 36 ]
-                [ el [ Font.bold ] (text <| "Edit event " ++ String.fromInt evt.id)
-                , column [ spacing 12 ]
-                    [ inputChangeNoteDuration model
-                    , changeDurationButton model
-                    ]
+                [ el [ Font.bold ] (text <| "Edit note " ++ String.fromInt evt.id)
                 , row [ spacing 12 ]
                     [ deleteNoteButton model
                     , showIf (model.deleteNoteSafety == DeleteNoteSafetyOff) cancelDeleteNoteButton
                     ]
                 ]
-
-
-graph model events_ =
-    let
-        events__ =
-            List.reverse events_
-    in
-    Graph.barChart (gA model) (prepareData (getScaleFactor model) events__) |> Element.html
 
 
 
@@ -849,25 +799,23 @@ graph model events_ =
 newNotePanel : Int -> Model -> Element FrontendMsg
 newNotePanel w model =
     column [ spacing 24, width (px w) ]
-        [ row [ Border.width 1, padding 12, spacing 12, width (px 300) ] [ submitNoteButton, inputNoteDuration model ]
-        , largeElapsedTimePanel model
+        [ row [ Border.width 1, padding 12, spacing 12, width (px 300) ] [ submitNoteButton, inputNoteBody model ]
         ]
 
 
-prepareData : Float -> List Note -> List Float
-prepareData scaleFactor_ eventList =
-    List.map (floatValueOfNote scaleFactor_) eventList
-
-
-floatValueOfNote : Float -> Note -> Float
-floatValueOfNote scaleFactor_ event =
-    event |> .duration |> convertToSeconds |> (\x -> x / scaleFactor_)
+inputNoteBody model =
+    Input.text (Style.inputStyle 200)
+        { onChange = GotNoteBody
+        , text = model.noteBody
+        , placeholder = Nothing
+        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
+        }
 
 
 submitNoteButton : Element FrontendMsg
 submitNoteButton =
     Input.button Style.button
-        { onPress = Just MakeNote
+        { onPress = Just MakeNewNote
         , label = Element.text "New: minutes or hh:mm"
         }
 
@@ -902,20 +850,14 @@ newNote model =
         ( Just user, True ) ->
             let
                 now =
-                    case model.currentTime of
-                        Nothing ->
-                            Time.millisToPosix 0
-
-                        Just t ->
-                            Time.millisToPosix t
+                    model.currentTime
             in
             Just <|
                 { id = -1
-                , counter = 0
-                , name = model.newNoteName
+                , subject = model.newNoteName
                 , body = ""
                 , timeCreated = now
-                , timeModfied = now
+                , timeModified = now
                 , tags = []
                 }
 
@@ -964,24 +906,15 @@ adminView_ model user =
                   , width = px 200
                   , view = \k usr -> el [ Font.size 12 ] (text usr.email)
                   }
-                , { header = el [ Font.bold ] (text "Notes")
-                  , width = px 80
-                  , view = \k usr -> el [ Font.size 12 ] (text <| displayNumberOfNotes usr.username model.userStats)
-                  }
-                , { header = el [ Font.bold ] (text "Notes")
-                  , width = px 80
-                  , view = \k usr -> el [ Font.size 12 ] (text <| displayNumberOfNotes usr.username model.userStats)
-                  }
                 ]
             }
-        , cleanDataButton model
         ]
 
 
 eventListDisplay : Model -> Element FrontendMsg
 eventListDisplay model =
     column [ spacing 20, height (px 450), width (px 350), Border.width 1 ]
-        [ viewNote model
+        [ viewNotes model
         ]
 
 
@@ -1052,8 +985,8 @@ noteListPanel model =
         ]
 
 
-viewNotes : Model -> Element FrontendMsg
-viewNotes model =
+viewNotes2 : Model -> Element FrontendMsg
+viewNotes2 model =
     let
         idx k note =
             String.fromInt note.id
@@ -1080,16 +1013,16 @@ viewNotes model =
 noteNameButton : Maybe Note -> Note -> Element FrontendMsg
 noteNameButton currentNote note =
     Input.button (Style.titleButton (currentNote == Just note))
-        { onPress = Just (GetNotes note.id)
-        , label = Element.text note.name
+        { onPress = Just NoOpFrontendMsg
+        , label = Element.text note.subject
         }
 
 
 setCurrentNoteButton : Model -> Note -> Int -> Element FrontendMsg
-setCurrentNoteButton model event index =
-    Input.button (Style.titleButton (Just event == model.maybeCurrentNote))
-        { onPress = Just (SetCurrentNote event)
-        , label = el [ Font.bold ] (Element.text <| String.fromInt event.id)
+setCurrentNoteButton model note index =
+    Input.button (Style.titleButton (Just note == model.maybeCurrentNote))
+        { onPress = Just NoOpFrontendMsg
+        , label = el [ Font.bold ] (Element.text <| String.fromInt note.id)
         }
 
 
@@ -1101,59 +1034,9 @@ setCurrentNoteButton model event index =
 
 type alias UpdateNoteRecord =
     { currentNote : Note
-    , noteList : List Note
+    , notes : List Note
     , cmd : Cmd FrontendMsg
     }
-
-
-addNoteUsingString : Maybe User -> String -> Posix -> Note -> List Note -> UpdateNoteRecord
-addNoteUsingString maybeUser eventDurationString currentTime note noteList =
-    case TypedTime.decodeHM eventDurationString of
-        Nothing ->
-            { currentNote = note, noteList = noteList, cmd = Cmd.none }
-
-        Just duration ->
-            addNote maybeUser (TypedTime.convertFromSecondsWithUnit Seconds duration) currentTime note noteList
-
-
-addNote : Maybe User -> TypedTime -> Posix -> Note -> List Note -> UpdateNoteRecord
-addNote maybeUser duration currentTime note noteList =
-    let
-        newNote_ =
-            Note.insertNote "" duration currentTime note
-
-        newNotes =
-            Note.replaceNote newNote_ noteList
-
-        cmd =
-            sendToBackend timeoutInMs SentToBackendResult (SendNoteToBackend maybeUser newNote_)
-    in
-    { currentNote = newNote_, noteList = newNotes, cmd = cmd }
-
-
-changeNoteUsingString : Maybe User -> String -> String -> Note -> Note -> List Note -> UpdateNoteRecord
-changeNoteUsingString maybeUser note eventDurationString event note noteList =
-    case TypedTime.decodeHM eventDurationString of
-        Just duration ->
-            changeNote maybeUser note (TypedTime.convertFromSecondsWithUnit Seconds duration) event note noteList
-
-        Nothing ->
-            { currentNote = note, noteList = noteList, cmd = Cmd.none }
-
-
-changeNote : Maybe User -> String -> TypedTime -> Note -> Note -> List Note -> UpdateNoteRecord
-changeNote maybeUser note duration event note noteList =
-    let
-        newNote_ =
-            Note.updateNote "" duration event note
-
-        newNotes =
-            Note.replaceNote newNote_ noteList
-
-        cmd =
-            sendToBackend timeoutInMs SentToBackendResult (SendNoteToBackend maybeUser newNote_)
-    in
-    { currentNote = newNote_, noteList = newNotes, cmd = cmd }
 
 
 

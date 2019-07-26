@@ -1,4 +1,4 @@
-module Note exposing (Note, bigDateFilter, filter, replace)
+module Note exposing (Note, bigDateFilter, filter, kDaysAgo, replace)
 
 import List.Extra
 import Time exposing (Posix)
