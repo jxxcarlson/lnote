@@ -30,7 +30,7 @@ n1 : Note
 n1 =
     { id = 1
     , subject = "AAA"
-    , body = "This is a test"
+    , body = "This is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test. I repeat: this is a test."
     , tags = [ "foo", "bar" ]
     , timeCreated = Time.millisToPosix 1563424248000
     , timeModified = Time.millisToPosix 1563424248000

@@ -20,6 +20,7 @@ import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Lamdera.Frontend as Frontend
 import Lamdera.Types exposing (..)
+import Markdown
 import Msg exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendMsg(..), ToBackend(..), ToFrontend(..), ValidationState(..))
 import Note exposing (Note)
 import Style
@@ -74,6 +75,7 @@ type alias Model =
 
     -- NOTES
     , notes : List Note
+    , currentNote : Maybe Note
     , newNoteName : String
     , changedNoteName : String
     , deleteNoteSafety : DeleteNoteSafety
@@ -109,6 +111,7 @@ initialModel =
 
     -- NOTES
     , notes = []
+    , currentNote = Nothing
     , maybeCurrentNote = Nothing
     , noteBody = ""
     , newNoteName = ""
@@ -288,6 +291,9 @@ update msg model =
             ( initialModel, Cmd.none )
 
         -- NOtE
+        SetCurrentNote note ->
+            ( { model | currentNote = Just note }, Cmd.none )
+
         GotNoteFilter str ->
             ( { model | noteFilterString = str }, Cmd.none )
 
@@ -641,8 +647,9 @@ masterView model =
         [ filterPanel model
         , row []
             [ noteListPanel model
-            , eventListDisplay model
-            , notePanel model
+            , viewNote model.currentNote
+
+            -- , notePanel model
             ]
         , column [ spacing 12 ]
             [ row [ spacing 12 ] [ newNoteButton, inputNewNoteName model ]
@@ -737,8 +744,8 @@ viewNotes model =
                   , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| note.timeCreated)
                   }
                 , { header = el [ Font.bold ] (text "Subject")
-                  , width = px 40
-                  , view = \k note -> el [ Font.size 12 ] (text <| note.subject)
+                  , width = px 180
+                  , view = \k note -> selectNoteButton note
                   }
                 ]
             }
@@ -746,6 +753,14 @@ viewNotes model =
             [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
             ]
         ]
+
+
+selectNoteButton : Note -> Element FrontendMsg
+selectNoteButton note =
+    Input.button Style.listItemButton
+        { onPress = Just <| SetCurrentNote note
+        , label = el [ Font.size 12, Font.color Style.darkBlue ] (text note.subject)
+        }
 
 
 idLabel : Model -> String
@@ -911,11 +926,19 @@ adminView_ model user =
         ]
 
 
-eventListDisplay : Model -> Element FrontendMsg
-eventListDisplay model =
-    column [ spacing 20, height (px 450), width (px 350), Border.width 1 ]
-        [ viewNotes model
-        ]
+viewNote : Maybe Note -> Element FrontendMsg
+viewNote maybeNote =
+    case maybeNote of
+        Nothing ->
+            column [ padding 20, spacing 20, height (px 450), width (px 350), Border.width 1 ]
+                [ el [ Font.size 12 ] (text "No note selected")
+                ]
+
+        Just note ->
+            column [ padding 20, spacing 12, height (px 450), width (px 350), Border.width 1 ]
+                [ el [ Font.size 12, Font.bold ] (text note.subject)
+                , Element.paragraph [ Font.size 12 ] [ text note.body ]
+                ]
 
 
 filterPanel model =
@@ -985,31 +1008,6 @@ noteListPanel model =
         ]
 
 
-viewNotes2 : Model -> Element FrontendMsg
-viewNotes2 model =
-    let
-        idx k note =
-            String.fromInt note.id
-    in
-    column [ spacing 12, padding 20, height (px 400) ]
-        [ el [ Font.size 16, Font.bold ] (text "Notes")
-        , indexedTable
-            [ spacing 4, Font.size 12, height (px 370), width (px 300), scrollbarY ]
-            { data = Note.filter model.noteFilterString model.notes
-            , columns =
-                [ { header = el [ Font.bold ] (text "k")
-                  , width = px 20
-                  , view = \k note -> el [ Font.size 12 ] (text <| idx k note)
-                  }
-                , { header = el [ Font.bold ] (text "Name")
-                  , width = px 170
-                  , view = \k note -> el [ Font.size 12 ] (noteNameButton model.maybeCurrentNote note)
-                  }
-                ]
-            }
-        ]
-
-
 noteNameButton : Maybe Note -> Note -> Element FrontendMsg
 noteNameButton currentNote note =
     Input.button (Style.titleButton (currentNote == Just note))
@@ -1037,6 +1035,26 @@ type alias UpdateNoteRecord =
     , notes : List Note
     , cmd : Cmd FrontendMsg
     }
+
+
+
+--
+-- MARKDOWN
+--
+
+
+myOptions : Markdown.Options
+myOptions =
+    { githubFlavored = Just { tables = True, breaks = False }
+    , defaultHighlighting = Nothing
+    , sanitize = True
+    , smartypants = False
+    }
+
+
+toMarkdown : String -> Html FrontendMsg
+toMarkdown userInput =
+    Markdown.toHtmlWith myOptions [] userInput
 
 
 

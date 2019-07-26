@@ -19,6 +19,7 @@ module Style exposing
     , inputStyle
     , lightGrey
     , listElementButtonStyleWithWidth2
+    , listItemButton
     , mainColumn
     , mainColumn2
     , mainColumnPhone
@@ -94,6 +95,11 @@ buttonWithWidth width_ =
 button : List (Element.Attr () msg)
 button =
     [ Background.color black, Font.color white, Element.paddingXY 10 6 ] ++ basicButtonsStyle
+
+
+listItemButton : List (Element.Attr () msg)
+listItemButton =
+    basicButtonsStyle
 
 
 dangerousButton : List (Element.Attr () msg)

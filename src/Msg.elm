@@ -70,6 +70,7 @@ type FrontendMsg
     | GotChangedNoteName String
     | GotNoteBody String
     | GotNewNoteName String
+    | SetCurrentNote Note
     | DeleteCurrentNote
     | MakeNewNote
     | GotNoteDateBeforeFilter String
