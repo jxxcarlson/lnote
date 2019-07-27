@@ -1,4 +1,4 @@
-module Note exposing (Note, bigDateFilter, filter, kDaysAgo, make, remove, replace)
+module Note exposing (Note, bigDateFilter, filter, filterText, kDaysAgo, make, remove, replace)
 
 import List.Extra
 import Time exposing (Posix)
@@ -40,12 +40,6 @@ remove note noteList =
     List.filter (\n -> n.id /= note.id) noteList
 
 
-
--- filter : String -> List Note -> List Note
--- filter str noteList =
---     noteList
-
-
 bigDateFilter : Posix -> String -> String -> List Note -> List Note
 bigDateFilter today prefixParameterString suffixParameterString noteList =
     noteList
@@ -76,6 +70,20 @@ prefixFilter today prefixParameterString noteList =
 filter : String -> List Note -> List Note
 filter filterString notes =
     List.filter (\note -> String.contains (String.toLower filterString) (String.toLower note.subject)) notes
+
+
+filterText : String -> List Note -> List Note
+filterText filterString notes =
+    case filterString of
+        "" ->
+            notes
+
+        _ ->
+            let
+                textFilter str note =
+                    String.contains (String.toLower str) (String.toLower note.body)
+            in
+            List.filter (\note -> textFilter filterString note) notes
 
 
 dateSuffixFilter : Posix -> Int -> List Note -> List Note

@@ -83,6 +83,7 @@ type alias Model =
     , changedSubject : String
     , noteBody : String
     , noteFilterString : String
+    , textFilterString : String
     , noteCameBeforeString : String
     , noteCameAfterString : String
     , deleteNoteSafety : DeleteNoteSafety
@@ -119,6 +120,7 @@ initialModel =
     , newSubject = ""
     , changedSubject = ""
     , noteFilterString = ""
+    , textFilterString = ""
     , deleteNoteSafety = DeleteNoteSafetyOn
     , noteCameBeforeString = ""
     , noteCameAfterString = ""
@@ -314,6 +316,9 @@ update msg model =
         GotNoteFilter str ->
             -- ###
             ( { model | noteFilterString = str }, Cmd.none )
+
+        GotTextFilter str ->
+            ( { model | textFilterString = str }, Cmd.none )
 
         GotNoteDateAfterFilter str ->
             ( { model | noteCameAfterString = str }, Cmd.none )
@@ -866,6 +871,7 @@ viewNotes model =
         notes =
             Note.bigDateFilter today model.noteCameBeforeString model.noteCameAfterString model.notes
                 |> Note.filter model.noteFilterString
+                |> Note.filterText model.textFilterString
     in
     column [ spacing 12, padding 20, height (px 430) ]
         [ el [ Font.size 16, Font.bold ] (text "Notes")
@@ -1049,8 +1055,10 @@ viewNote maybeNote =
 
 filterPanel model =
     row [ spacing 8 ]
-        [ el [ Font.bold ] (text "Filter:")
+        [ el [ Font.bold ] (text "Filter subject:")
         , inputNoteNameFilter model
+        , el [ Font.bold ] (text "Filter text:")
+        , inputTextFilter model
 
         -- , row [ spacing 8 ]
         --     [ el [ Font.bold, Font.size 14 ] (text "After")
@@ -1084,6 +1092,15 @@ inputNoteNameFilter model =
     Input.text (Style.inputStyle 200)
         { onChange = GotNoteFilter
         , text = model.noteFilterString
+        , placeholder = Nothing
+        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
+        }
+
+
+inputTextFilter model =
+    Input.text (Style.inputStyle 200)
+        { onChange = GotTextFilter
+        , text = model.textFilterString
         , placeholder = Nothing
         , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
         }
