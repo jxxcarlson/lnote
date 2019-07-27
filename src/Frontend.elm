@@ -932,7 +932,7 @@ newNote model =
             Just <|
                 { id = -1
                 , subject = model.newSubject
-                , body = model.noteBody
+                , body = "# " ++ model.newSubject ++ "\n\n" ++ model.noteBody
                 , timeCreated = now
                 , timeModified = now
                 , tags = []
