@@ -16,6 +16,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Element.Keyed as Keyed
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Html.Attributes as HA
@@ -63,6 +64,7 @@ type alias Model =
     { input : String
     , appMode : AppMode
     , message : String
+    , counter : Int
     , currentTime : Posix
 
     -- USER
@@ -98,6 +100,7 @@ initialModel =
     , message = "Please sign in"
     , appMode = UserValidation SignInState
     , currentTime = Time.millisToPosix 0
+    , counter = 0
 
     -- ADMIN
     , -- USER
@@ -301,8 +304,9 @@ update msg model =
         SetCurrentNote note ->
             ( { model
                 | maybeCurrentNote = Just note
-                , changedSubject = Debug.log "BE, SetCurrentNote, SUBJECT" note.subject
-                , noteBody = Debug.log "BE, SetCurrentNote, BODY" note.body
+                , changedSubject = note.subject
+                , noteBody = note.body
+                , counter = model.counter + 1
               }
             , Cmd.none
             )
@@ -319,14 +323,15 @@ update msg model =
 
         MakeNewNote ->
             let
-                newNote_ =
-                    Note.make -1 "New Note" "" model.currentTime
+                n =
+                    Note.make -1 "New Note" "XXX" model.currentTime
             in
             ( { model
                 | appMode = UserNotes CreatingNote
-                , maybeCurrentNote = Just newNote_
-                , noteBody = newNote_.body
-                , newSubject = newNote_.subject
+                , maybeCurrentNote = Just n
+                , noteBody = n.body
+                , newSubject = n.subject
+                , counter = model.counter + 1
               }
             , Cmd.none
             )
@@ -342,6 +347,7 @@ update msg model =
                         , changedSubject = n.subject
                         , noteBody = n.body
                         , appMode = UserNotes EditingNote
+                        , counter = model.counter + 1
                       }
                     , sendToBackend timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
                     )
@@ -354,7 +360,7 @@ update msg model =
                 Just note ->
                     let
                         updatedNote =
-                            { note | subject = Debug.log "BE, DoUpdateNote, subject" model.changedSubject, body = model.noteBody }
+                            { note | subject = model.changedSubject, body = model.noteBody }
                     in
                     ( { model
                         | maybeCurrentNote = Just updatedNote
@@ -742,16 +748,24 @@ masterView model =
 
 
 newNotePanel model =
+    let
+        key =
+            "aa" ++ String.fromInt model.counter
+    in
     column [ spacing 12, paddingXY 20 0 ]
         [ row [ spacing 12 ] [ newNoteButton, inputNewNoteName model ]
-        , inputNoteBody model
+        , Keyed.row [] [ ( key, inputNoteBody model ) ]
         ]
 
 
 editNotePanel model =
+    let
+        key =
+            "a" ++ String.fromInt model.counter
+    in
     column [ spacing 12, paddingXY 20 0 ]
         [ row [ spacing 12 ] [ updateNoteButton, inputChangedSubject model ]
-        , inputNoteBody model
+        , Keyed.row [] [ ( key, inputNoteBody model ) ]
         ]
 
 
