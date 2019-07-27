@@ -1,4 +1,4 @@
-module Note exposing (Note, bigDateFilter, filter, kDaysAgo, remove, replace)
+module Note exposing (Note, bigDateFilter, filter, kDaysAgo, make, remove, replace)
 
 import List.Extra
 import Time exposing (Posix)
@@ -11,6 +11,17 @@ type alias Note =
     , body : String
     , timeCreated : Posix
     , timeModified : Posix
+    }
+
+
+make : Int -> String -> String -> Posix -> Note
+make id subject body posix =
+    { id = id
+    , subject = subject
+    , tags = []
+    , body = body
+    , timeCreated = posix
+    , timeModified = posix
     }
 
 

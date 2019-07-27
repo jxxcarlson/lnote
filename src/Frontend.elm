@@ -79,11 +79,11 @@ type alias Model =
     , maybeCurrentNote : Maybe Note
     , newSubject : String
     , changedSubject : String
-    , deleteNoteSafety : DeleteNoteSafety
     , noteBody : String
     , noteFilterString : String
     , noteCameBeforeString : String
     , noteCameAfterString : String
+    , deleteNoteSafety : DeleteNoteSafety
     }
 
 
@@ -303,8 +303,8 @@ update msg model =
         SetCurrentNote note ->
             ( { model
                 | maybeCurrentNote = Just note
-                , changedSubject = note.subject
-                , noteBody = note.body
+                , changedSubject = Debug.log "BE, SetCurrentNote, SUBJECT" note.subject
+                , noteBody = Debug.log "BE, SetCurrentNote, BODY" note.body
               }
             , Cmd.none
             )
@@ -325,7 +325,7 @@ update msg model =
                     ( model, Cmd.none )
 
                 Just n ->
-                    ( { model | maybeCurrentNote = Just n, notes = n :: model.notes, appMode = UserNotes EditingNote }
+                    ( { model | maybeCurrentNote = Just <| Debug.log "BE! MakeNewNote" n, notes = n :: model.notes, appMode = UserNotes EditingNote }
                     , sendToBackend timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
                     )
 
@@ -364,16 +364,16 @@ update msg model =
             ( { model | newSubject = str }, Cmd.none )
 
         GotNoteBody str ->
-            case model.maybeCurrentNote of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just note ->
-                    let
-                        updatedNote_ =
+            let
+                updatedNote_ =
+                    case model.maybeCurrentNote of
+                        Just note ->
                             { note | body = str }
-                    in
-                    ( { model | noteBody = str, maybeCurrentNote = Just updatedNote_ }, Cmd.none )
+
+                        Nothing ->
+                            Note.make -1 "???" str model.currentTime
+            in
+            ( { model | noteBody = str, maybeCurrentNote = Just updatedNote_ }, Cmd.none )
 
         GotChangedSubject str ->
             ( { model | changedSubject = str }, Cmd.none )
