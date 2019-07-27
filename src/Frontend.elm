@@ -310,6 +310,7 @@ update msg model =
             )
 
         GotNoteFilter str ->
+            -- ###
             ( { model | noteFilterString = str }, Cmd.none )
 
         GotNoteDateAfterFilter str ->
@@ -365,7 +366,7 @@ update msg model =
         GotNoteBody str ->
             ( { model | noteBody = str }, Cmd.none )
 
-        GotChangedNoteName str ->
+        GotChangedSubject str ->
             ( { model | changedSubject = str }, Cmd.none )
 
 
@@ -707,7 +708,7 @@ newNotePanel model =
 
 editNotePanel model =
     column [ spacing 12, paddingXY 20 0 ]
-        [ row [ spacing 12 ] [ updateNoteButton, inputNewNoteName model ]
+        [ row [ spacing 12 ] [ updateNoteButton, inputChangedSubject model ]
         , inputNoteBody model
         ]
 
@@ -784,6 +785,15 @@ inputNewNoteName model =
         }
 
 
+inputChangedSubject model =
+    Input.text (Style.inputStyle 250)
+        { onChange = GotChangedSubject
+        , text = model.changedSubject
+        , placeholder = Nothing
+        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
+        }
+
+
 
 --
 --
@@ -799,6 +809,7 @@ viewNotes model =
 
         notes =
             Note.bigDateFilter today model.noteCameBeforeString model.noteCameAfterString model.notes
+                |> Note.filter model.noteFilterString
     in
     column [ spacing 12, padding 20, height (px 430) ]
         [ el [ Font.size 16, Font.bold ] (text "Notes")

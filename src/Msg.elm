@@ -68,7 +68,7 @@ type FrontendMsg
     | ChangeUrl Url
     | ClickLink UrlRequest
       -- NOTES
-    | GotChangedNoteName String
+    | GotChangedSubject String
     | GotNoteBody String
     | GotNewNoteName String
     | SetCurrentNote Note
