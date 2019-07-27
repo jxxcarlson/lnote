@@ -874,7 +874,7 @@ viewNotes model =
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
-                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt k)
+                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt (k + 1))
                   }
                 , { header = el [ Font.bold ] (text "Date")
                   , width = px 80
