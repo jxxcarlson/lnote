@@ -351,7 +351,11 @@ update msg model =
                     ( { model | deleteNoteSafety = DeleteNoteSafetyOn }, Cmd.none )
 
                 Just note ->
-                    ( { model | maybeCurrentNote = Nothing, deleteNoteSafety = DeleteNoteSafetyOn }
+                    ( { model
+                        | maybeCurrentNote = Nothing
+                        , deleteNoteSafety = DeleteNoteSafetyOn
+                        , notes = Note.remove note model.notes
+                      }
                     , sendToBackend timeoutInMs SentToBackendResult (DeleteNote model.currentUser note)
                     )
 
@@ -394,6 +398,7 @@ mainView model =
             , setNoteModeButton BrowsingNotes "Browse" model
             , setNoteModeButton EditingNote "Edit" model
             , setNoteModeButton CreatingNote "Create" model
+            , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
             ]
         ]
 

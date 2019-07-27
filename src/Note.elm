@@ -1,4 +1,4 @@
-module Note exposing (Note, bigDateFilter, filter, kDaysAgo, replace)
+module Note exposing (Note, bigDateFilter, filter, kDaysAgo, remove, replace)
 
 import List.Extra
 import Time exposing (Posix)
@@ -17,6 +17,11 @@ type alias Note =
 replace : Note -> List Note -> List Note
 replace note noteList =
     List.Extra.setIf (\n -> n.id == note.id) note noteList
+
+
+remove : Note -> List Note -> List Note
+remove note noteList =
+    List.filter (\n -> n.id /= note.id) noteList
 
 
 
