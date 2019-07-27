@@ -1054,24 +1054,30 @@ viewNote maybeNote =
 
 
 filterPanel model =
-    row [ spacing 8 ]
-        [ el [ Font.bold ] (text "Filter subject:")
-        , inputNoteNameFilter model
-        , el [ Font.bold ] (text "Filter text:")
-        , inputTextFilter model
-
-        -- , row [ spacing 8 ]
-        --     [ el [ Font.bold, Font.size 14 ] (text "After")
-        --     , displayShiftedDate model.noteCameAfterString model.currentTime
-        --     ]
-        -- , inputNoteCameAfterFilter model
-        -- , row [ spacing 8 ]
-        --     [ el [ Font.bold, Font.size 14 ] (text "Before")
-        --     , displayShiftedDate model.noteCameBeforeString model.currentTime
-        --     ]
-        -- , inputNoteCameBeforeFilter model
-        --, row [ alignRight, moveRight 36, spacing 12 ] [ editModeButton sharedState model, noteModeButton model ]
+    row [ spacing 24 ]
+        [ row [ spacing 8 ]
+            [ el [ Font.bold ] (text "Filter subject:")
+            , inputNoteNameFilter model
+            ]
+        , row [ spacing 8 ]
+            [ el [ Font.bold ] (text "Filter body:")
+            , inputTextFilter model
+            ]
         ]
+
+
+
+-- , row [ spacing 8 ]
+--     [ el [ Font.bold, Font.size 14 ] (text "After")
+--     , displayShiftedDate model.noteCameAfterString model.currentTime
+--     ]
+-- , inputNoteCameAfterFilter model
+-- , row [ spacing 8 ]
+--     [ el [ Font.bold, Font.size 14 ] (text "Before")
+--     , displayShiftedDate model.noteCameBeforeString model.currentTime
+--     ]
+-- , inputNoteCameBeforeFilter model
+--, row [ alignRight, moveRight 36, spacing 12 ] [ editModeButton sharedState model, noteModeButton model ]
 
 
 displayShiftedDate : String -> Posix -> Element FrontendMsg
