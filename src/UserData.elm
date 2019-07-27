@@ -6,11 +6,11 @@ import TypedTime exposing (TypedTime)
 import User exposing (UserDict, UserInfo, Username)
 
 
-create : Username -> Note -> UserDict Note -> UserDict Note
+create : Username -> Note -> UserDict Note -> Result String ( Note, UserDict Note )
 create username note userDict =
     case Dict.get username userDict of
         Nothing ->
-            userDict
+            Err "user not present"
 
         Just userInfo ->
             let
@@ -21,7 +21,7 @@ create username note userDict =
                 updater =
                     Maybe.map (\uInfo -> { uInfo | counter = uInfo.counter + 1, data = newNote :: uInfo.data })
             in
-            Dict.update username updater userDict
+            Ok ( newNote, Dict.update username updater userDict )
 
 
 update : Username -> Note -> UserDict Note -> UserDict Note

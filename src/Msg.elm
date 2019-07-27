@@ -39,6 +39,7 @@ type ToFrontend
     | SendValidatedUser (Maybe User)
     | SendUserList (List User)
     | SendNotesToFrontend (List Note)
+    | SendNoteToFrontend Note
 
 
 type BackendMsg
@@ -74,6 +75,7 @@ type FrontendMsg
     | SetCurrentNote Note
     | DeleteCurrentNote
     | MakeNewNote
+    | FECreateNote
     | DoUpdateNote
     | GotNoteDateBeforeFilter String
     | GotNoteDateAfterFilter String

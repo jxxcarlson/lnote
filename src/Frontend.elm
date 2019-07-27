@@ -158,6 +158,14 @@ updateFromBackend msg model =
         SendNotesToFrontend newNoteList ->
             ( { model | notes = newNoteList }, Cmd.none )
 
+        SendNoteToFrontend note ->
+            ( { model
+                | notes = note :: model.notes
+                , maybeCurrentNote = Just note
+              }
+            , Cmd.none
+            )
+
         SendUserList userList ->
             ( { model | userList = userList }, Cmd.none )
 
@@ -229,20 +237,10 @@ update msg model =
 
                         _ ->
                             ""
-
-                ( newSubject, newBody ) =
-                    case ( mode, model.maybeCurrentNote ) of
-                        ( UserNotes EditingNote, Just note ) ->
-                            ( note.subject, note.body )
-
-                        _ ->
-                            ( "", "" )
             in
             ( { model
                 | appMode = mode
                 , message = message
-                , changedSubject = newSubject
-                , noteBody = newBody
               }
             , cmd
             )
@@ -320,12 +318,31 @@ update msg model =
             ( { model | noteCameBeforeString = str }, Cmd.none )
 
         MakeNewNote ->
+            let
+                newNote_ =
+                    Note.make -1 "New Note" "" model.currentTime
+            in
+            ( { model
+                | appMode = UserNotes CreatingNote
+                , maybeCurrentNote = Just newNote_
+                , noteBody = newNote_.body
+                , newSubject = newNote_.subject
+              }
+            , Cmd.none
+            )
+
+        FECreateNote ->
             case newNote model of
                 Nothing ->
                     ( model, Cmd.none )
 
                 Just n ->
-                    ( { model | maybeCurrentNote = Just <| Debug.log "BE! MakeNewNote" n, notes = n :: model.notes, appMode = UserNotes EditingNote }
+                    ( { model
+                        | maybeCurrentNote = Just n
+                        , changedSubject = n.subject
+                        , noteBody = n.body
+                        , appMode = UserNotes EditingNote
+                      }
                     , sendToBackend timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
                     )
 
@@ -337,10 +354,13 @@ update msg model =
                 Just note ->
                     let
                         updatedNote =
-                            { note | subject = model.changedSubject, body = model.noteBody }
+                            { note | subject = Debug.log "BE, DoUpdateNote, subject" model.changedSubject, body = model.noteBody }
                     in
                     ( { model
                         | maybeCurrentNote = Just updatedNote
+                        , changedSubject = updatedNote.subject
+                        , newSubject = updatedNote.subject
+                        , noteBody = updatedNote.body
                         , notes = Note.replace updatedNote model.notes
                       }
                     , sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser updatedNote)
@@ -408,13 +428,21 @@ mainView model =
                 [ el [ Font.bold, Font.color Style.white ] (text "Note:")
                 , setNoteModeButton BrowsingNotes "Browse" model
                 , setNoteModeButton EditingNote "Edit" model
-                , setNoteModeButton CreatingNote "Create" model
+                , makeNewNoteButton model
                 , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
                 ]
             )
         , showIf (model.currentUser == Nothing)
             (row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 18 ] [])
         ]
+
+
+makeNewNoteButton model =
+    Input.button
+        ((Style.select <| model.appMode == UserNotes CreatingNote) Style.selectedHeaderButton Style.headerButton)
+        { onPress = Just MakeNewNote
+        , label = Element.text "Create"
+        }
 
 
 
@@ -752,7 +780,7 @@ noteControls model =
 newNoteButton : Element FrontendMsg
 newNoteButton =
     Input.button Style.button
-        { onPress = Just MakeNewNote
+        { onPress = Just FECreateNote
         , label = Element.text "Create note"
         }
 
@@ -831,7 +859,7 @@ viewNotes model =
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
-                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt k)
+                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt k ++ ", " ++ String.fromInt note.id)
                   }
                 , { header = el [ Font.bold ] (text "Date")
                   , width = px 80
@@ -892,7 +920,7 @@ noteNotePanel model =
 submitNoteButton : Element FrontendMsg
 submitNoteButton =
     Input.button Style.button
-        { onPress = Just MakeNewNote
+        { onPress = Just FECreateNote
         , label = Element.text "New: minutes or hh:mm"
         }
 

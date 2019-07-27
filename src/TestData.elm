@@ -30,7 +30,7 @@ n1 : Note
 n1 =
     { id = 1
     , subject = "AAA"
-    , body = someText ++ moreText
+    , body = "body of AAA"
     , tags = [ "foo", "bar" ]
     , timeCreated = Time.millisToPosix 1563424248000
     , timeModified = Time.millisToPosix 1563424248000
