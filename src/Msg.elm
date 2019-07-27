@@ -3,6 +3,7 @@ module Msg exposing
     , BackendMsg(..)
     , DeleteNoteSafety(..)
     , FrontendMsg(..)
+    , NotesMode(..)
     , ToBackend(..)
     , ToFrontend(..)
     , ValidationState(..)
@@ -73,6 +74,7 @@ type FrontendMsg
     | SetCurrentNote Note
     | DeleteCurrentNote
     | MakeNewNote
+    | DoUpdateNote
     | GotNoteDateBeforeFilter String
     | GotNoteDateAfterFilter String
     | GotNoteFilter String
@@ -80,9 +82,15 @@ type FrontendMsg
 
 
 type AppMode
-    = UserMode
+    = UserNotes NotesMode
     | UserValidation ValidationState
     | Admin
+
+
+type NotesMode
+    = BrowsingNotes
+    | CreatingNote
+    | EditingNote
 
 
 type DeleteNoteSafety

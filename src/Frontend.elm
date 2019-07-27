@@ -1,7 +1,7 @@
 module Frontend exposing (Model, app)
 
 --
--- import Main exposing (UserMode)
+-- import Main exposing (UserNotes)
 -- import Svg.Attributes exposing (k1)
 -- exposing (..)
 -- import Date exposing (Date)
@@ -22,7 +22,7 @@ import Html.Attributes as HA
 import Lamdera.Frontend as Frontend
 import Lamdera.Types exposing (..)
 import Markdown
-import Msg exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendMsg(..), ToBackend(..), ToFrontend(..), ValidationState(..))
+import Msg exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendMsg(..), NotesMode(..), ToBackend(..), ToFrontend(..), ValidationState(..))
 import Note exposing (Note)
 import Style
 import Task
@@ -44,7 +44,7 @@ app =
         , subscriptions = subscriptions
         , view =
             \model ->
-                { title = "Lamdera Alpha"
+                { title = "Lamdera Notes"
                 , body = [ view model ]
                 }
         }
@@ -76,15 +76,14 @@ type alias Model =
 
     -- NOTES
     , notes : List Note
-    , currentNote : Maybe Note
-    , newNoteName : String
-    , changedNoteName : String
+    , maybeCurrentNote : Maybe Note
+    , newSubject : String
+    , changedSubject : String
     , deleteNoteSafety : DeleteNoteSafety
     , noteBody : String
     , noteFilterString : String
     , noteCameBeforeString : String
     , noteCameAfterString : String
-    , maybeCurrentNote : Maybe Note
     }
 
 
@@ -112,11 +111,10 @@ initialModel =
 
     -- NOTES
     , notes = []
-    , currentNote = Nothing
     , maybeCurrentNote = Nothing
     , noteBody = ""
-    , newNoteName = ""
-    , changedNoteName = ""
+    , newSubject = ""
+    , changedSubject = ""
     , noteFilterString = ""
     , deleteNoteSafety = DeleteNoteSafetyOn
     , noteCameBeforeString = ""
@@ -169,7 +167,7 @@ updateFromBackend msg model =
                     ( { model | currentUser = Nothing, message = "Incorrect password/username" }, Cmd.none )
 
                 Just user ->
-                    ( { model | currentUser = Just user, appMode = UserMode }
+                    ( { model | currentUser = Just user, appMode = UserNotes BrowsingNotes }
                     , sendToBackend timeoutInMs SentToBackendResult (RequestNotes (Just user))
                     )
 
@@ -231,10 +229,20 @@ update msg model =
 
                         _ ->
                             ""
+
+                ( newSubject, newBody ) =
+                    case ( mode, model.maybeCurrentNote ) of
+                        ( UserNotes EditingNote, Just note ) ->
+                            ( note.subject, note.body )
+
+                        _ ->
+                            ( "", "" )
             in
             ( { model
                 | appMode = mode
                 , message = message
+                , changedSubject = newSubject
+                , noteBody = newBody
               }
             , cmd
             )
@@ -293,7 +301,7 @@ update msg model =
 
         -- NOtE
         SetCurrentNote note ->
-            ( { model | currentNote = Just note }, Cmd.none )
+            ( { model | maybeCurrentNote = Just note }, Cmd.none )
 
         GotNoteFilter str ->
             ( { model | noteFilterString = str }, Cmd.none )
@@ -310,8 +318,25 @@ update msg model =
                     ( model, Cmd.none )
 
                 Just n ->
-                    ( { model | maybeCurrentNote = Just n, notes = n :: model.notes }
+                    ( { model | maybeCurrentNote = Just n, notes = n :: model.notes, appMode = UserNotes EditingNote }
                     , sendToBackend timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
+                    )
+
+        DoUpdateNote ->
+            case model.maybeCurrentNote of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just note ->
+                    let
+                        updatedNote =
+                            { note | subject = model.changedSubject, body = model.noteBody }
+                    in
+                    ( { model
+                        | maybeCurrentNote = Just updatedNote
+                        , notes = Note.replace updatedNote model.notes
+                      }
+                    , sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser updatedNote)
                     )
 
         DeleteCurrentNote ->
@@ -325,13 +350,13 @@ update msg model =
                     )
 
         GotNewNoteName str ->
-            ( { model | newNoteName = str }, Cmd.none )
+            ( { model | newSubject = str }, Cmd.none )
 
         GotNoteBody str ->
             ( { model | noteBody = str }, Cmd.none )
 
         GotChangedNoteName str ->
-            ( { model | changedNoteName = str }, Cmd.none )
+            ( { model | changedSubject = str }, Cmd.none )
 
 
 
@@ -353,11 +378,17 @@ mainView model =
             UserValidation _ ->
                 userValidationView model
 
-            UserMode ->
+            UserNotes _ ->
                 masterView model
 
             Admin ->
                 adminView model
+        , row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 8 ]
+            [ el [ Font.bold, Font.color Style.white ] (text "Note:")
+            , setNoteModeButton BrowsingNotes "Browse" model
+            , setNoteModeButton CreatingNote "Create" model
+            , setNoteModeButton EditingNote "Edit" model
+            ]
         ]
 
 
@@ -588,7 +619,8 @@ header model =
         ]
         [ showIf (currentUserIsAdmin model) (adminModeButton model)
         , userValidationModeButton model
-        , el [ centerX, Font.size 18, Font.color Style.white ] (text <| currentUserName model ++ ": Notes")
+        , setNoteModeButton BrowsingNotes "Notes" model
+        , el [ centerX, Font.size 18, Font.color Style.white ] (text <| appTitle model)
         ]
 
 
@@ -602,14 +634,14 @@ currentUserIsAdmin model =
             user.admin
 
 
-currentUserName : Model -> String
-currentUserName model =
+appTitle : Model -> String
+appTitle model =
     case model.currentUser of
         Nothing ->
-            ""
+            "Notes"
 
         Just user ->
-            " for " ++ user.username
+            user.username ++ ": Notes"
 
 
 userValidationModeButton : Model -> Element FrontendMsg
@@ -628,11 +660,11 @@ adminModeButton model =
         }
 
 
-notegingModeButton : Model -> Element FrontendMsg
-notegingModeButton model =
-    Input.button ((Style.select <| model.appMode == UserMode) Style.selectedHeaderButton Style.headerButton)
-        { onPress = Just (SetAppMode UserMode)
-        , label = Element.text "Notes"
+setNoteModeButton : NotesMode -> String -> Model -> Element FrontendMsg
+setNoteModeButton notesMode label model =
+    Input.button ((Style.select <| model.appMode == UserNotes notesMode) Style.selectedHeaderButton Style.headerButton)
+        { onPress = Just (SetAppMode <| UserNotes notesMode)
+        , label = Element.text label
         }
 
 
@@ -648,8 +680,9 @@ masterView model =
         [ filterPanel model
         , row []
             [ noteListPanel model
-            , viewNote model.currentNote
-            , newNotePanel model
+            , showIf (model.appMode == UserNotes CreatingNote) (newNotePanel model)
+            , showIf (model.appMode == UserNotes EditingNote) (editNotePanel model)
+            , viewNote model.maybeCurrentNote
             ]
         ]
 
@@ -661,8 +694,15 @@ newNotePanel model =
         ]
 
 
+editNotePanel model =
+    column [ spacing 12, paddingXY 20 0 ]
+        [ row [ spacing 12 ] [ updateNoteButton, inputNewNoteName model ]
+        , inputNoteBody model
+        ]
+
+
 inputNoteBody model =
-    Input.multiline (Style.multiline 300 410)
+    Input.multiline (Style.multiline 320 410)
         { onChange = GotNoteBody
         , text = model.noteBody
         , placeholder = Nothing
@@ -688,7 +728,15 @@ newNoteButton : Element FrontendMsg
 newNoteButton =
     Input.button Style.button
         { onPress = Just MakeNewNote
-        , label = Element.text "New note"
+        , label = Element.text "Create note"
+        }
+
+
+updateNoteButton : Element FrontendMsg
+updateNoteButton =
+    Input.button Style.button
+        { onPress = Just DoUpdateNote
+        , label = Element.text "Update note"
         }
 
 
@@ -719,7 +767,7 @@ deleteNoteButton model =
 inputNewNoteName model =
     Input.text (Style.inputStyle 200)
         { onChange = GotNewNoteName
-        , text = model.newNoteName
+        , text = model.newSubject
         , placeholder = Nothing
         , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
         }
@@ -840,7 +888,7 @@ showOne bit str1 str2 =
 
 newNote : Model -> Maybe Note
 newNote model =
-    case ( model.currentUser, String.length model.newNoteName > 0 ) of
+    case ( model.currentUser, String.length model.newSubject > 0 ) of
         ( Just user, True ) ->
             let
                 now =
@@ -848,7 +896,7 @@ newNote model =
             in
             Just <|
                 { id = -1
-                , subject = model.newNoteName
+                , subject = model.newSubject
                 , body = model.noteBody
                 , timeCreated = now
                 , timeModified = now
@@ -987,8 +1035,8 @@ noteListPanel model =
 
 
 noteNameButton : Maybe Note -> Note -> Element FrontendMsg
-noteNameButton currentNote note =
-    Input.button (Style.titleButton (currentNote == Just note))
+noteNameButton maybeCurrentNote note =
+    Input.button (Style.titleButton (maybeCurrentNote == Just note))
         { onPress = Just NoOpFrontendMsg
         , label = Element.text note.subject
         }
@@ -1009,7 +1057,7 @@ setCurrentNoteButton model note index =
 
 
 type alias UpdateNoteRecord =
-    { currentNote : Note
+    { maybeCurrentNote : Note
     , notes : List Note
     , cmd : Cmd FrontendMsg
     }
