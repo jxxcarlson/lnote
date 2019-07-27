@@ -882,12 +882,13 @@ viewNotes model =
                   , width = px 30
                   , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt (k + 1))
                   }
-                , { header = el [ Font.bold ] (text "Date")
-                  , width = px 80
-                  , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| note.timeCreated)
-                  }
+
+                -- , { header = el [ Font.bold ] (text "Date")
+                --   , width = px 80
+                --   , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| note.timeCreated)
+                --   }
                 , { header = el [ Font.bold ] (text "Subject")
-                  , width = px 170
+                  , width = px 220
                   , view = \k note -> selectNoteButton note
                   }
                 ]
