@@ -1108,7 +1108,7 @@ myOptions : Markdown.Options
 myOptions =
     { githubFlavored = Just { tables = True, breaks = False }
     , defaultHighlighting = Nothing
-    , sanitize = True
+    , sanitize = False
     , smartypants = False
     }
 
@@ -1118,6 +1118,7 @@ markdownStyle =
     , HA.style "width" "300px"
     , HA.style "overflow-y" "scroll"
     , HA.style "white-space" "normal"
+    , HA.style "img" "width: 200px"
 
     -- , HA.style "p" "display: inline-block"
     ]
