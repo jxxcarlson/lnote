@@ -880,7 +880,7 @@ viewNotes model =
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
-                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt (k + 1))
+                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt note.id)
                   }
 
                 -- , { header = el [ Font.bold ] (text "Date")
@@ -1049,8 +1049,21 @@ viewNote maybeNote =
                 ]
 
         Just note ->
+            let
+                created =
+                    "*Created: " ++ DateTime.humanDateStringFromPosix note.timeCreated ++ "*, "
+
+                modified =
+                    "*modified: " ++ DateTime.humanDateStringFromPosix note.timeModified ++ "*\n\n"
+
+                title =
+                    "# " ++ note.subject ++ "\n\n"
+
+                content =
+                    title ++ created ++ modified ++ note.body
+            in
             column [ padding 20, spacing 12, height (px 450), width (px 350), Border.width 1 ]
-                [ toMarkdown note.body |> Element.html
+                [ toMarkdown content |> Element.html
                 ]
 
 
