@@ -394,13 +394,17 @@ mainView model =
 
             Admin ->
                 adminView model
-        , row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 8 ]
-            [ el [ Font.bold, Font.color Style.white ] (text "Note:")
-            , setNoteModeButton BrowsingNotes "Browse" model
-            , setNoteModeButton EditingNote "Edit" model
-            , setNoteModeButton CreatingNote "Create" model
-            , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
-            ]
+        , showIf (model.currentUser /= Nothing)
+            (row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 8 ]
+                [ el [ Font.bold, Font.color Style.white ] (text "Note:")
+                , setNoteModeButton BrowsingNotes "Browse" model
+                , setNoteModeButton EditingNote "Edit" model
+                , setNoteModeButton CreatingNote "Create" model
+                , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
+                ]
+            )
+        , showIf (model.currentUser == Nothing)
+            (row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 18 ] [])
         ]
 
 
