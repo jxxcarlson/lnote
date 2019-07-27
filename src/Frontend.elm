@@ -160,7 +160,7 @@ updateFromBackend msg model =
 
         SendNoteToFrontend note ->
             ( { model
-                | notes = note :: model.notes
+                | notes = Note.replace note model.notes
                 , maybeCurrentNote = Just note
               }
             , Cmd.none
@@ -361,7 +361,8 @@ update msg model =
                         , changedSubject = updatedNote.subject
                         , newSubject = updatedNote.subject
                         , noteBody = updatedNote.body
-                        , notes = Note.replace updatedNote model.notes
+
+                        -- , notes = Note.replace updatedNote model.notes
                       }
                     , sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser updatedNote)
                     )
@@ -859,7 +860,7 @@ viewNotes model =
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
-                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt k ++ ", " ++ String.fromInt note.id)
+                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt k)
                   }
                 , { header = el [ Font.bold ] (text "Date")
                   , width = px 80

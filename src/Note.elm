@@ -27,7 +27,12 @@ make id subject body posix =
 
 replace : Note -> List Note -> List Note
 replace note noteList =
-    List.Extra.setIf (\n -> n.id == note.id) note noteList
+    case List.member note.id (noteList |> List.map .id) of
+        True ->
+            List.Extra.setIf (\n -> n.id == note.id) note noteList
+
+        False ->
+            note :: noteList
 
 
 remove : Note -> List Note -> List Note

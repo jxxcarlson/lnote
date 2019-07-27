@@ -24,11 +24,11 @@ create username note userDict =
             Ok ( newNote, Dict.update username updater userDict )
 
 
-update : Username -> Note -> UserDict Note -> UserDict Note
+update : Username -> Note -> UserDict Note -> Result String ( Note, UserDict Note )
 update username note userDict =
     case Dict.get username userDict of
         Nothing ->
-            userDict
+            Err "username not in dict"
 
         Just userInfo ->
             let
@@ -38,7 +38,7 @@ update username note userDict =
                 newUserInfo =
                     { userInfo | data = newData }
             in
-            Dict.update username (\x -> Just newUserInfo) userDict
+            Ok ( note, Dict.update username (\x -> Just newUserInfo) userDict )
 
 
 delete : Username -> Note -> UserDict Note -> UserDict Note

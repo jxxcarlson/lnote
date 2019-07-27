@@ -117,14 +117,6 @@ updateFromFrontend clientId msg model =
                     in
                     ( model, sendToFrontend clientId (SendNotesToFrontend userNotes) )
 
-        SendNoteToBackend maybeUserName note ->
-            case maybeUserName of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just user ->
-                    ( { model | userDict = UserData.update user.username note model.userDict }, Cmd.none )
-
         CreateNote maybeUsername note ->
             case maybeUsername of
                 Nothing ->
@@ -154,19 +146,14 @@ updateFromFrontend clientId msg model =
                     ( model, Cmd.none )
 
                 Just user ->
-                    let
-                        -- NOTE: very bad code, use for now
-                        userDict =
-                            UserData.update user.username note model.userDict
+                    case UserData.update user.username note model.userDict of
+                        Err _ ->
+                            ( model, Cmd.none )
 
-                        userNotes =
-                            Dict.get user.username userDict
-                                |> Maybe.map .data
-                                |> Maybe.withDefault []
-                    in
-                    ( { model | userDict = userDict }
-                    , sendToFrontend clientId (SendNotesToFrontend userNotes)
-                    )
+                        Ok ( note_, userDict ) ->
+                            ( { model | userDict = userDict }
+                            , sendToFrontend clientId (SendNoteToFrontend note_)
+                            )
 
         ClientJoin ->
             ( model, Cmd.none )
