@@ -1107,7 +1107,7 @@ type alias UpdateNoteRecord =
 myOptions : Markdown.Options
 myOptions =
     { githubFlavored = Just { tables = True, breaks = False }
-    , defaultHighlighting = Nothing
+    , defaultHighlighting = Just "elm"
     , sanitize = False
     , smartypants = False
     }
