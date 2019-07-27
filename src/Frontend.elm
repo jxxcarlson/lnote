@@ -364,7 +364,16 @@ update msg model =
             ( { model | newSubject = str }, Cmd.none )
 
         GotNoteBody str ->
-            ( { model | noteBody = str }, Cmd.none )
+            case model.maybeCurrentNote of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just note ->
+                    let
+                        updatedNote_ =
+                            { note | body = str }
+                    in
+                    ( { model | noteBody = str, maybeCurrentNote = Just updatedNote_ }, Cmd.none )
 
         GotChangedSubject str ->
             ( { model | changedSubject = str }, Cmd.none )
