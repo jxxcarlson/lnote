@@ -70,7 +70,7 @@ I repeat: this is a test. I repeat: this is a test.
 
 n2 : Note
 n2 =
-    { id = 1
+    { id = 2
     , subject = "BBB"
     , body = "Also a test"
     , tags = [ "foo" ]

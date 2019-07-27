@@ -301,7 +301,13 @@ update msg model =
 
         -- NOtE
         SetCurrentNote note ->
-            ( { model | maybeCurrentNote = Just note }, Cmd.none )
+            ( { model
+                | maybeCurrentNote = Just note
+                , changedSubject = note.subject
+                , noteBody = note.body
+              }
+            , Cmd.none
+            )
 
         GotNoteFilter str ->
             ( { model | noteFilterString = str }, Cmd.none )
@@ -386,8 +392,8 @@ mainView model =
         , row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 8 ]
             [ el [ Font.bold, Font.color Style.white ] (text "Note:")
             , setNoteModeButton BrowsingNotes "Browse" model
-            , setNoteModeButton CreatingNote "Create" model
             , setNoteModeButton EditingNote "Edit" model
+            , setNoteModeButton CreatingNote "Create" model
             ]
         ]
 
@@ -736,7 +742,7 @@ updateNoteButton : Element FrontendMsg
 updateNoteButton =
     Input.button Style.button
         { onPress = Just DoUpdateNote
-        , label = Element.text "Update note"
+        , label = Element.text "Save"
         }
 
 
