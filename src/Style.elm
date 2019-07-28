@@ -159,7 +159,7 @@ activeButtonDarkRed active =
 
 
 smallButton =
-    [ Background.color black, Font.color grey, Font.size 12, Element.paddingXY 6 4, alignRight ] ++ basicButtonsStyle
+    basicButtonsStyle ++ [ Background.color charcoal, Font.color grey, Font.size 12, Element.paddingXY 6 4 ]
 
 
 smallButtonRed =

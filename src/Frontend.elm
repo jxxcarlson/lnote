@@ -1099,6 +1099,7 @@ viewNotes model =
             [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
             ]
         , tagButtons model
+        , clearTagSearch
         ]
 
 
@@ -1115,6 +1116,14 @@ tagButton ( tag, freq ) =
     Input.button (Style.titleButton False)
         { onPress = Just (SetTagForSearch tag)
         , label = text (tag ++ ": " ++ String.fromInt freq)
+        }
+
+
+clearTagSearch : Element FrontendMsg
+clearTagSearch =
+    Input.button Style.smallButton
+        { onPress = Just (SetTagForSearch "")
+        , label = text "Clear tag search"
         }
 
 
