@@ -83,6 +83,7 @@ type alias Model =
 
     -- NOTES
     , notes : List Note
+    , selectedNotes : List Note
     , maybeCurrentNote : Maybe Note
     , frequencyDict : FrequencyDict
     , newSubject : String
@@ -132,6 +133,7 @@ initialModel =
 
     -- NOTES
     , notes = []
+    , selectedNotes = []
     , maybeCurrentNote = Nothing
     , frequencyDict = Dict.empty
     , noteBody = ""
@@ -177,11 +179,12 @@ updateFromBackend msg model =
             ( { model | message = str }, Cmd.none )
 
         SendNotesToFrontend newNoteList ->
-            ( { model | notes = newNoteList }, Cmd.none )
+            ( { model | notes = newNoteList, selectedNotes = newNoteList }, Cmd.none )
 
         SendNoteToFrontend note ->
             ( { model
                 | notes = Note.replace note model.notes
+                , selectedNotes = Note.replace note model.selectedNotes
                 , maybeCurrentNote = Just note
               }
             , Cmd.none
@@ -415,23 +418,62 @@ update msg model =
             )
 
         GotNoteFilter str ->
-            -- ###
-            ( { model | noteFilterString = str }, Cmd.none )
+            let
+                selectedNotes =
+                    selectNotes model
+            in
+            ( { model
+                | noteFilterString = str
+                , selectedNotes = selectedNotes
+                , maybeCurrentNote = List.head selectedNotes
+              }
+            , Cmd.none
+            )
 
         GotTextFilter str ->
-            ( { model | textFilterString = str }, Cmd.none )
+            let
+                selectedNotes =
+                    selectNotes model
+            in
+            ( { model
+                | textFilterString = str
+                , selectedNotes = selectedNotes
+                , maybeCurrentNote = List.head selectedNotes
+              }
+            , Cmd.none
+            )
 
         GotTagFilter str ->
-            ( { model | tagFilterString = str }, Cmd.none )
+            let
+                selectedNotes =
+                    selectNotes model
+            in
+            ( { model
+                | tagFilterString = str
+                , selectedNotes = selectedNotes
+                , maybeCurrentNote = List.head selectedNotes
+              }
+            , Cmd.none
+            )
 
         SetTagForSearch tag ->
-            ( { model | tagFilterString = tag }, Cmd.none )
+            let
+                selectedNotes =
+                    selectNotes model
+            in
+            ( { model
+                | tagFilterString = tag
+                , selectedNotes = selectedNotes
+                , maybeCurrentNote = List.head selectedNotes
+              }
+            , Cmd.none
+            )
 
         GotNoteDateAfterFilter str ->
-            ( { model | noteCameAfterString = str }, Cmd.none )
+            ( { model | noteCameAfterString = str, selectedNotes = selectNotes model }, Cmd.none )
 
         GotNoteDateBeforeFilter str ->
-            ( { model | noteCameBeforeString = str }, Cmd.none )
+            ( { model | noteCameBeforeString = str, selectedNotes = selectNotes model }, Cmd.none )
 
         MakeNewNote ->
             let
@@ -514,6 +556,7 @@ update msg model =
                         | maybeCurrentNote = Nothing
                         , deleteNoteSafety = DeleteNoteSafetyOn
                         , notes = Note.remove note model.notes
+                        , selectedNotes = Note.remove note model.selectedNotes
                       }
                     , sendToBackend config.timeoutInMs SentToBackendResult (DeleteNote model.currentUser note)
                     )
@@ -1065,30 +1108,15 @@ inputChangedSubject model =
 
 viewNotes : Model -> Element FrontendMsg
 viewNotes model =
-    let
-        today =
-            model.currentTime
-
-        notes =
-            Note.bigDateFilter today model.noteCameBeforeString model.noteCameAfterString model.notes
-                |> Note.filter model.noteFilterString
-                |> Note.filterText model.textFilterString
-                |> Note.filterByTag model.tagFilterString
-    in
     column [ spacing 12, padding 20, height (px 430) ]
         [ el [ Font.size 16, Font.bold ] (text "Notes")
         , indexedTable [ spacing 4, Font.size 12, height (px 400), scrollbarY ]
-            { data = notes
+            { data = model.selectedNotes
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
                   , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt note.id)
                   }
-
-                -- , { header = el [ Font.bold ] (text "Date")
-                --   , width = px 80
-                --   , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix <| note.timeCreated)
-                --   }
                 , { header = el [ Font.bold ] (text "Subject")
                   , width = px 220
                   , view = \k note -> selectNoteButton model.maybeCurrentNote note
@@ -1096,7 +1124,7 @@ viewNotes model =
                 ]
             }
         , row [ spacing 24, alignBottom, alignLeft ]
-            [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
+            [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length model.selectedNotes))
             ]
         , tagButtons model
         , clearTagSearch
@@ -1229,6 +1257,13 @@ newNote model =
 
         _ ->
             Nothing
+
+
+selectNotes model =
+    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
+        |> Note.filter model.noteFilterString
+        |> Note.filterText model.textFilterString
+        |> Note.filterByTag model.tagFilterString
 
 
 
