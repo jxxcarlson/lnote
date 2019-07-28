@@ -102,6 +102,12 @@ type alias Model =
 --
 
 
+config =
+    { debounceInterval = 500
+    , timeoutInMs = 5 * 1000
+    }
+
+
 initialModel =
     { input = "App started"
     , message = "Please sign in"
@@ -140,11 +146,7 @@ initialModel =
 
 init : ( Model, Cmd FrontendMsg )
 init =
-    ( initialModel, sendToBackend timeoutInMs SentToBackendResult ClientJoin )
-
-
-timeoutInMs =
-    5 * 1000
+    ( initialModel, sendToBackend config.timeoutInMs SentToBackendResult ClientJoin )
 
 
 sendToBackend : Milliseconds -> (Result WsError () -> FrontendMsg) -> ToBackend -> Cmd FrontendMsg
@@ -192,27 +194,27 @@ updateFromBackend msg model =
 
                 Just user ->
                     ( { model | currentUser = Just user, appMode = UserNotes BrowsingNotes }
-                    , sendToBackend timeoutInMs SentToBackendResult (RequestNotes (Just user))
+                    , sendToBackend config.timeoutInMs SentToBackendResult (RequestNotes (Just user))
                     )
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg
 bodyDebounceConfig =
-    { strategy = Debounce.later 1000
+    { strategy = Debounce.later config.debounceInterval
     , transform = DebounceBody
     }
 
 
 subjectDebounceConfig : Debounce.Config FrontendMsg
 subjectDebounceConfig =
-    { strategy = Debounce.later 1000
+    { strategy = Debounce.later config.debounceInterval
     , transform = DebounceSubject
     }
 
 
 tagDebounceConfig : Debounce.Config FrontendMsg
 tagDebounceConfig =
-    { strategy = Debounce.later 1000
+    { strategy = Debounce.later config.debounceInterval
     , transform = DebounceTags
     }
 
@@ -232,7 +234,7 @@ update msg model =
                             \s -> Cmd.none
 
                         Just note ->
-                            \s -> sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s })
 
                 ( debounce, cmd ) =
                     Debounce.update
@@ -252,7 +254,7 @@ update msg model =
                             \s -> Cmd.none
 
                         Just note ->
-                            \s -> sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s })
 
                 ( debounce, cmd ) =
                     Debounce.update
@@ -272,7 +274,7 @@ update msg model =
                             \s -> Cmd.none
 
                         Just note ->
-                            \s -> sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | tags = Note.tagsFromString s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | tags = Note.tagsFromString s })
 
                 ( debounce, cmd ) =
                     Debounce.update
@@ -294,7 +296,7 @@ update msg model =
 
                 True ->
                     ( model
-                    , sendToBackend timeoutInMs SentToBackendResult RequestUsers
+                    , sendToBackend config.timeoutInMs SentToBackendResult RequestUsers
                     )
 
         -- BACKEND
@@ -319,7 +321,7 @@ update msg model =
                 cmd =
                     case mode of
                         Admin ->
-                            sendToBackend timeoutInMs SentToBackendResult RequestUsers
+                            sendToBackend config.timeoutInMs SentToBackendResult RequestUsers
 
                         _ ->
                             Cmd.none
@@ -367,7 +369,7 @@ update msg model =
 
                         Just user ->
                             ( { model | message = "OK" }
-                            , sendToBackend timeoutInMs SentToBackendResult (SendChangePasswordInfo user.username model.password model.newPassword1)
+                            , sendToBackend config.timeoutInMs SentToBackendResult (SendChangePasswordInfo user.username model.password model.newPassword1)
                             )
 
                 errorList ->
@@ -377,7 +379,7 @@ update msg model =
             ( { model | email = str }, Cmd.none )
 
         SignIn ->
-            ( initialModel, sendToBackend timeoutInMs SentToBackendResult (SendSignInInfo model.username model.password) )
+            ( initialModel, sendToBackend config.timeoutInMs SentToBackendResult (SendSignInInfo model.username model.password) )
 
         SignUp ->
             let
@@ -389,7 +391,7 @@ update msg model =
                     ( { model | message = String.join ", " signUpErrors }, Cmd.none )
 
                 False ->
-                    ( initialModel, sendToBackend timeoutInMs SentToBackendResult (SendSignUpInfo model.username model.password model.email) )
+                    ( initialModel, sendToBackend config.timeoutInMs SentToBackendResult (SendSignUpInfo model.username model.password model.email) )
 
         SignOut ->
             ( initialModel, Cmd.none )
@@ -451,7 +453,7 @@ update msg model =
                         , appMode = UserNotes EditingNote
                         , counter = model.counter + 1
                       }
-                    , sendToBackend timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
+                    , sendToBackend config.timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
                     )
 
         FEEditNote ->
@@ -490,7 +492,7 @@ update msg model =
 
                         -- , notes = Note.replace updatedNote model.notes
                       }
-                    , sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser updatedNote)
+                    , sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser updatedNote)
                     )
 
         DeleteCurrentNote ->
@@ -504,7 +506,7 @@ update msg model =
                         , deleteNoteSafety = DeleteNoteSafetyOn
                         , notes = Note.remove note model.notes
                       }
-                    , sendToBackend timeoutInMs SentToBackendResult (DeleteNote model.currentUser note)
+                    , sendToBackend config.timeoutInMs SentToBackendResult (DeleteNote model.currentUser note)
                     )
 
         GotNewNoteName str ->
