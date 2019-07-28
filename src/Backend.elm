@@ -138,8 +138,15 @@ updateFromFrontend clientId msg model =
                             ( model, Cmd.none )
 
                         Ok ( newNote, userDict ) ->
-                            ( { model | userDict = userDict }
-                            , sendToFrontend clientId (SendNoteToFrontend newNote)
+                            let
+                                ( fD, newUserDict ) =
+                                    updateFrequencyDictionary user.username userDict
+                            in
+                            ( { model | userDict = newUserDict }
+                            , Cmd.batch
+                                [ sendToFrontend clientId (SendNoteToFrontend newNote)
+                                , sendToFrontend clientId <| SendFrequencyDict fD
+                                ]
                             )
 
         DeleteNote maybeUsername note ->
@@ -161,8 +168,15 @@ updateFromFrontend clientId msg model =
                             ( model, Cmd.none )
 
                         Ok ( note_, userDict ) ->
-                            ( { model | userDict = userDict }
-                            , sendToFrontend clientId (SendNoteToFrontend note_)
+                            let
+                                ( fD, newUserDict ) =
+                                    updateFrequencyDictionary user.username userDict
+                            in
+                            ( { model | userDict = newUserDict }
+                            , Cmd.batch
+                                [ sendToFrontend clientId (SendNoteToFrontend note_)
+                                , sendToFrontend clientId <| SendFrequencyDict fD
+                                ]
                             )
 
         ClientJoin ->
