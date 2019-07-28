@@ -344,6 +344,7 @@ update msg model =
                 , maybeCurrentNote = Just n
                 , noteBody = n.body
                 , newSubject = n.subject
+                , tagString = ""
                 , counter = model.counter + 1
               }
             , Cmd.none
