@@ -1136,7 +1136,7 @@ tagButtons model =
     model.frequencyDict
         |> FrequencyDict.list
         |> List.map (\item -> tagButton item)
-        |> (\x -> row [ spacing 8, Font.size 14 ] x)
+        |> (\x -> Element.paragraph [ spacing 8, Font.size 14 ] x)
 
 
 tagButton : ( String, Int ) -> Element FrontendMsg
