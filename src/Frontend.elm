@@ -108,6 +108,8 @@ type alias Model =
 config =
     { debounceInterval = 500
     , timeoutInMs = 5 * 1000
+    , panelHeight = 550
+    , panelWidth = 400
     }
 
 
@@ -179,7 +181,13 @@ updateFromBackend msg model =
             ( { model | message = str }, Cmd.none )
 
         SendNotesToFrontend newNoteList ->
-            ( { model | notes = newNoteList, selectedNotes = newNoteList }, Cmd.none )
+            ( { model
+                | notes = newNoteList
+                , selectedNotes = newNoteList
+                , maybeCurrentNote = List.head newNoteList
+              }
+            , Cmd.none
+            )
 
         SendNoteToFrontend note ->
             ( { model
@@ -515,6 +523,8 @@ update msg model =
                 Just note ->
                     ( { model
                         | appMode = UserNotes EditingNote
+                        , noteBody = note.body
+                        , changedSubject = note.subject
                         , tagString = String.join ", " note.tags
                       }
                     , Cmd.none
@@ -1010,7 +1020,7 @@ editNotePanel model =
 
 
 inputNoteBody model =
-    Input.multiline (Style.multiline 320 365)
+    Input.multiline (Style.multiline 320 (config.panelHeight - 85))
         { onChange = GotNoteBody
         , text = model.noteBody
         , placeholder = Nothing
@@ -1108,9 +1118,9 @@ inputChangedSubject model =
 
 viewNotes : Model -> Element FrontendMsg
 viewNotes model =
-    column [ spacing 12, padding 20, height (px 430) ]
+    column [ spacing 12, padding 20, height (px 510) ]
         [ el [ Font.size 16, Font.bold ] (text "Notes")
-        , indexedTable [ spacing 4, Font.size 12, height (px 400), scrollbarY ]
+        , indexedTable [ spacing 4, Font.size 12, height (px (config.panelHeight - 50)), scrollbarY ]
             { data = model.selectedNotes
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
@@ -1123,11 +1133,13 @@ viewNotes model =
                   }
                 ]
             }
-        , row [ spacing 24, alignBottom, alignLeft ]
-            [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length model.selectedNotes))
+        , column [ spacing 8 ]
+            [ row [ spacing 24, alignBottom, alignLeft ]
+                [ el [ Font.size 14, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length model.selectedNotes))
+                ]
+            , tagButtons model
+            , clearTagSearch
             ]
-        , tagButtons model
-        , clearTagSearch
         ]
 
 
@@ -1136,12 +1148,13 @@ tagButtons model =
     model.frequencyDict
         |> FrequencyDict.list
         |> List.map (\item -> tagButton item)
-        |> (\x -> Element.paragraph [ spacing 8, Font.size 14 ] x)
+        |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
+        |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (px (2 * config.panelWidth - 40)) ] x)
 
 
 tagButton : ( String, Int ) -> Element FrontendMsg
 tagButton ( tag, freq ) =
-    Input.button (Style.titleButton False)
+    Input.button (Style.titleButton False ++ [ paddingXY 4 0 ])
         { onPress = Just (SetTagForSearch tag)
         , label = text (tag ++ ": " ++ String.fromInt freq)
         }
@@ -1171,27 +1184,6 @@ idLabel model =
 
 --
 -- VIEW NOTE
---
-
-
-noteNotePanel model =
-    case model.maybeCurrentNote of
-        Nothing ->
-            Element.none
-
-        Just evt ->
-            column [ width (px 300), height (px 450), padding 12, Border.width 1, spacing 36 ]
-                [ el [ Font.bold ] (text <| "Edit note " ++ String.fromInt evt.id)
-                , row [ spacing 12 ]
-                    [ deleteNoteButton model
-                    , showIf (model.deleteNoteSafety == DeleteNoteSafetyOff) cancelDeleteNoteButton
-                    ]
-                ]
-
-
-
---
---
 --
 
 
@@ -1316,7 +1308,7 @@ viewNote : Maybe Note -> Element FrontendMsg
 viewNote maybeNote =
     case maybeNote of
         Nothing ->
-            column [ padding 20, spacing 20, height (px 450), width (px 350), Border.width 1 ]
+            column [ padding 20, spacing 20, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
                 [ el [ Font.size 12 ] (text "No note selected")
                 ]
 
@@ -1347,7 +1339,7 @@ viewNote maybeNote =
                 content =
                     title ++ created ++ modified ++ tags ++ hr ++ note.body
             in
-            column [ padding 20, spacing 12, height (px 450), width (px 350), Border.width 1 ]
+            column [ padding 20, spacing 12, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
                 [ toMarkdown content |> Element.html
                 ]
 
@@ -1445,7 +1437,7 @@ inputNoteCameAfterFilter model =
 
 noteListPanel : Model -> Element FrontendMsg
 noteListPanel model =
-    column [ spacing 20, height (px 450), width (px 350), Border.width 1 ]
+    column [ spacing 20, height (px config.panelHeight), width (px (config.panelWidth - 50)), Border.width 1 ]
         [ viewNotes model
         ]
 
@@ -1496,7 +1488,7 @@ myOptions =
 
 markdownStyle =
     [ HA.style "font-size" "14px"
-    , HA.style "width" "300px"
+    , HA.style "width" (String.fromInt (config.panelWidth - 30) ++ "px")
     , HA.style "overflow-y" "scroll"
     , HA.style "white-space" "normal"
     , HA.style "line-height" "1.4"
