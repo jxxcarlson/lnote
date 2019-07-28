@@ -1200,7 +1200,7 @@ markdownStyle =
     , HA.style "width" "300px"
     , HA.style "overflow-y" "scroll"
     , HA.style "white-space" "normal"
-    , HA.style "img" "width: 200px"
+    , HA.style "line-height" "1.4"
 
     -- , HA.style "p" "display: inline-block"
     ]
