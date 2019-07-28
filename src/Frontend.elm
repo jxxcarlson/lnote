@@ -235,12 +235,12 @@ update msg model =
             -- YYY
             let
                 save =
-                    case model.maybeCurrentNote of
-                        Nothing ->
-                            \s -> Cmd.none
-
-                        Just note ->
+                    case ( model.maybeCurrentNote, model.appMode ) of
+                        ( Just note, UserNotes EditingNote ) ->
                             \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s })
+
+                        _ ->
+                            \s -> Cmd.none
 
                 ( debounce, cmd ) =
                     Debounce.update
@@ -255,12 +255,12 @@ update msg model =
             -- YYY
             let
                 save =
-                    case model.maybeCurrentNote of
-                        Nothing ->
-                            \s -> Cmd.none
-
-                        Just note ->
+                    case ( model.maybeCurrentNote, model.appMode ) of
+                        ( Just note, UserNotes EditingNote ) ->
                             \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s })
+
+                        _ ->
+                            \s -> Cmd.none
 
                 ( debounce, cmd ) =
                     Debounce.update
@@ -275,12 +275,12 @@ update msg model =
             -- YYY
             let
                 save =
-                    case model.maybeCurrentNote of
-                        Nothing ->
-                            \s -> Cmd.none
-
-                        Just note ->
+                    case ( model.maybeCurrentNote, model.appMode ) of
+                        ( Just note, UserNotes EditingNote ) ->
                             \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | tags = Note.tagsFromString s })
+
+                        _ ->
+                            \s -> Cmd.none
 
                 ( debounce, cmd ) =
                     Debounce.update
