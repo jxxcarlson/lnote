@@ -1,4 +1,4 @@
-module Note exposing (Note, bigDateFilter, filter, filterText, kDaysAgo, make, remove, replace)
+module Note exposing (Note, bigDateFilter, filter, filterText, kDaysAgo, make, remove, replace, tagsFromString)
 
 import List.Extra
 import Time exposing (Posix)
@@ -128,3 +128,10 @@ posixInterval p_ q_ =
             Time.posixToMillis q_ |> toFloat
     in
     (p - q) / 1000.0
+
+
+tagsFromString : String -> List String
+tagsFromString str =
+    str
+        |> String.split ","
+        |> List.map String.trim

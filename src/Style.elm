@@ -171,7 +171,7 @@ mainColumn w h =
 
 
 mainColumnX =
-    mainColumn fill fill ++ [ spacing 12, padding 40, Background.color (makeGrey 0.9) ]
+    mainColumn fill fill ++ [ spacing 12, padding 12, Background.color (makeGrey 0.9) ]
 
 
 mainColumn2 w h =

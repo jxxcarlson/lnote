@@ -82,6 +82,7 @@ type alias Model =
     , newSubject : String
     , changedSubject : String
     , noteBody : String
+    , tagString : String
     , noteFilterString : String
     , textFilterString : String
     , noteCameBeforeString : String
@@ -117,6 +118,7 @@ initialModel =
     , notes = []
     , maybeCurrentNote = Nothing
     , noteBody = ""
+    , tagString = ""
     , newSubject = ""
     , changedSubject = ""
     , noteFilterString = ""
@@ -188,7 +190,7 @@ updateFromBackend msg model =
 update : FrontendMsg -> Model -> ( Model, Cmd FrontendMsg )
 update msg model =
     case msg of
-        NoOpFrontendMsg ->
+        FENoop ->
             ( model, Cmd.none )
 
         TimeChange t ->
@@ -308,6 +310,7 @@ update msg model =
                 | maybeCurrentNote = Just note
                 , changedSubject = note.subject
                 , noteBody = note.body
+                , tagString = String.join ", " note.tags
                 , counter = model.counter + 1
               }
             , Cmd.none
@@ -357,6 +360,19 @@ update msg model =
                     , sendToBackend timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
                     )
 
+        FEEditNote ->
+            case model.maybeCurrentNote of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just note ->
+                    ( { model
+                        | appMode = UserNotes EditingNote
+                        , tagString = String.join ", " note.tags
+                      }
+                    , Cmd.none
+                    )
+
         DoUpdateNote ->
             case model.maybeCurrentNote of
                 Nothing ->
@@ -365,7 +381,11 @@ update msg model =
                 Just note ->
                     let
                         updatedNote =
-                            { note | subject = model.changedSubject, body = model.noteBody }
+                            { note
+                                | subject = model.changedSubject
+                                , body = model.noteBody
+                                , tags = Note.tagsFromString model.tagString
+                            }
                     in
                     ( { model
                         | maybeCurrentNote = Just updatedNote
@@ -394,6 +414,9 @@ update msg model =
 
         GotNewNoteName str ->
             ( { model | newSubject = str }, Cmd.none )
+
+        GotTagString str ->
+            ( { model | tagString = str }, Cmd.none )
 
         GotNoteBody str ->
             let
@@ -424,7 +447,7 @@ view model =
 
 mainView : Model -> Element FrontendMsg
 mainView model =
-    column []
+    column [ height fill ]
         [ header model
         , case model.appMode of
             UserValidation _ ->
@@ -435,17 +458,36 @@ mainView model =
 
             Admin ->
                 adminView model
-        , showIf (model.currentUser /= Nothing)
-            (row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 8 ]
-                [ el [ Font.bold, Font.color Style.white ] (text "Note:")
-                , setNoteModeButton BrowsingNotes "Browse" model
-                , setNoteModeButton EditingNote "Edit" model
-                , makeNewNoteButton model
-                , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
-                ]
-            )
-        , showIf (model.currentUser == Nothing)
-            (row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 18 ] [])
+        , footer model
+        ]
+
+
+
+--
+-- FOOTER
+--
+
+
+footer model =
+    case model.currentUser of
+        Nothing ->
+            blankFooter
+
+        Just _ ->
+            activeFooter model
+
+
+blankFooter =
+    row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 18 ] []
+
+
+activeFooter model =
+    row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 8 ]
+        [ el [ Font.bold, Font.color Style.white ] (text "Note:")
+        , setNoteModeButton BrowsingNotes "Browse" model
+        , hideIf (model.currentUser == Nothing) (editNoteButton model)
+        , makeNewNoteButton model
+        , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
         ]
 
 
@@ -454,6 +496,14 @@ makeNewNoteButton model =
         ((Style.select <| model.appMode == UserNotes CreatingNote) Style.selectedHeaderButton Style.headerButton)
         { onPress = Just MakeNewNote
         , label = Element.text "Create"
+        }
+
+
+editNoteButton model =
+    Input.button
+        ((Style.select <| model.appMode == UserNotes EditingNote) Style.selectedHeaderButton Style.headerButton)
+        { onPress = Just FEEditNote
+        , label = Element.text "Edit"
         }
 
 
@@ -641,7 +691,7 @@ cancelSignUpButton model =
                     Just (SetAppMode (UserValidation SignInState))
 
                 _ ->
-                    Just NoOpFrontendMsg
+                    Just FENoop
         , label = Element.text "Cancel"
         }
 
@@ -655,7 +705,7 @@ cancelChangePasswordButton model =
                     Just (SetAppMode (UserValidation SignInState))
 
                 _ ->
-                    Just NoOpFrontendMsg
+                    Just FENoop
         , label = Element.text "Cancel"
         }
 
@@ -754,28 +804,36 @@ masterView model =
 
 newNotePanel model =
     let
-        key =
+        key1 =
             "aa" ++ String.fromInt model.counter
+
+        key2 =
+            "bb" ++ String.fromInt model.counter
     in
     column [ spacing 12, paddingXY 20 0 ]
         [ row [ spacing 12 ] [ newNoteButton, inputNewNoteName model ]
-        , Keyed.row [] [ ( key, inputNoteBody model ) ]
+        , Keyed.row [] [ ( key1, inputNoteBody model ) ]
+        , Keyed.row [] [ ( key2, inputNoteTags model ) ]
         ]
 
 
 editNotePanel model =
     let
-        key =
+        key1 =
             "a" ++ String.fromInt model.counter
+
+        key2 =
+            "aa" ++ String.fromInt model.counter
     in
     column [ spacing 12, paddingXY 20 0 ]
         [ row [ spacing 12 ] [ updateNoteButton, inputChangedSubject model ]
-        , Keyed.row [] [ ( key, inputNoteBody model ) ]
+        , Keyed.row [] [ ( key1, inputNoteBody model ) ]
+        , Keyed.row [] [ ( key2, inputNoteTags model ) ]
         ]
 
 
 inputNoteBody model =
-    Input.multiline (Style.multiline 320 410)
+    Input.multiline (Style.multiline 320 365)
         { onChange = GotNoteBody
         , text = model.noteBody
         , placeholder = Nothing
@@ -843,6 +901,15 @@ inputNewNoteName model =
         , text = model.newSubject
         , placeholder = Nothing
         , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
+        }
+
+
+inputNoteTags model =
+    Input.text (Style.inputStyle 285)
+        { onChange = GotTagString
+        , text = model.tagString
+        , placeholder = Nothing
+        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "Tags: ")
         }
 
 
@@ -961,6 +1028,15 @@ showIf bit element =
         Element.none
 
 
+hideIf : Bool -> Element FrontendMsg -> Element FrontendMsg
+hideIf bit element =
+    if not bit then
+        element
+
+    else
+        Element.none
+
+
 showOne : Bool -> String -> String -> String
 showOne bit str1 str2 =
     case bit of
@@ -985,9 +1061,9 @@ newNote model =
 
                 --, body = "# " ++ model.newSubject ++ "\n\n" ++ model.noteBody
                 , body = model.noteBody
+                , tags = Note.tagsFromString model.tagString
                 , timeCreated = now
                 , timeModified = now
-                , tags = []
                 }
 
         _ ->
@@ -1167,7 +1243,7 @@ noteListPanel model =
 noteNameButton : Maybe Note -> Note -> Element FrontendMsg
 noteNameButton maybeCurrentNote note =
     Input.button (Style.titleButton (maybeCurrentNote == Just note))
-        { onPress = Just NoOpFrontendMsg
+        { onPress = Just FENoop
         , label = Element.text note.subject
         }
 
@@ -1175,7 +1251,7 @@ noteNameButton maybeCurrentNote note =
 setCurrentNoteButton : Model -> Note -> Int -> Element FrontendMsg
 setCurrentNoteButton model note index =
     Input.button (Style.titleButton (Just note == model.maybeCurrentNote))
-        { onPress = Just NoOpFrontendMsg
+        { onPress = Just FENoop
         , label = el [ Font.bold ] (Element.text <| String.fromInt note.id)
         }
 

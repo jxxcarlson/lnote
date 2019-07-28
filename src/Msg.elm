@@ -47,7 +47,7 @@ type BackendMsg
 
 
 type FrontendMsg
-    = NoOpFrontendMsg
+    = FENoop
       -- Admin
     | SendUsers
       -- App
@@ -71,10 +71,12 @@ type FrontendMsg
     | GotChangedSubject String
     | GotNoteBody String
     | GotNewNoteName String
+    | GotTagString String
     | SetCurrentNote Note
     | DeleteCurrentNote
     | MakeNewNote
     | FECreateNote
+    | FEEditNote
     | DoUpdateNote
     | GotNoteDateBeforeFilter String
     | GotNoteDateAfterFilter String
