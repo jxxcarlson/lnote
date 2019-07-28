@@ -18,6 +18,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
+import FrequencyDict exposing (FrequencyDict)
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Html.Attributes as HA
@@ -83,6 +84,7 @@ type alias Model =
     -- NOTES
     , notes : List Note
     , maybeCurrentNote : Maybe Note
+    , frequencyDict : FrequencyDict
     , newSubject : String
     , changedSubject : String
     , noteBody : String
@@ -131,6 +133,7 @@ initialModel =
     -- NOTES
     , notes = []
     , maybeCurrentNote = Nothing
+    , frequencyDict = Dict.empty
     , noteBody = ""
     , tagString = ""
     , newSubject = ""
@@ -196,6 +199,9 @@ updateFromBackend msg model =
                     ( { model | currentUser = Just user, appMode = UserNotes BrowsingNotes }
                     , sendToBackend config.timeoutInMs SentToBackendResult (RequestNotes (Just user))
                     )
+
+        SendFrequencyDict fD ->
+            ( { model | frequencyDict = fD }, Cmd.none )
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg
@@ -1089,6 +1095,7 @@ viewNotes model =
         , row [ spacing 24, alignBottom, alignLeft ]
             [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
             ]
+        , el [ Font.size 12 ] (text <| "Tags: " ++ FrequencyDict.asString 10 model.frequencyDict)
         ]
 
 

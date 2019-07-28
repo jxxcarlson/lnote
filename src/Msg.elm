@@ -11,6 +11,7 @@ module Msg exposing
 
 import Browser exposing (UrlRequest(..))
 import Debounce
+import FrequencyDict exposing (FrequencyDict)
 import Lamdera.Types exposing (ClientId, WsError)
 import Note exposing (Note)
 import Time exposing (Posix)
@@ -37,6 +38,7 @@ type ToFrontend
     = NoOpToFrontend
     | SendMessage String
     | SendValidatedUser (Maybe User)
+    | SendFrequencyDict FrequencyDict
     | SendUserList (List User)
     | SendNotesToFrontend (List Note)
     | SendNoteToFrontend Note

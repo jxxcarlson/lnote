@@ -4,9 +4,9 @@ module Note exposing
     , filter
     , filterByTag
     , filterText
+    , frequencies
     , kDaysAgo
     , make
-    , noteFrequencies
     , remove
     , replace
     , tagsFromString
@@ -164,6 +164,6 @@ tagsFromString str =
         |> List.map String.trim
 
 
-noteFrequencies : List Note -> FrequencyDict
-noteFrequencies noteList =
+frequencies : List Note -> FrequencyDict
+frequencies noteList =
     FrequencyDict.make (List.map .tags noteList |> List.concat)

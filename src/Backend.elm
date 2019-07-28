@@ -1,6 +1,7 @@
 module Backend exposing (Model, app, userList)
 
 import Dict exposing (Dict)
+import FrequencyDict exposing (FrequencyDict)
 import Frontend
 import Lamdera.Backend
 import Lamdera.Types exposing (..)
@@ -8,7 +9,7 @@ import Maybe.Extra
 import Msg exposing (..)
 import Note exposing (Note)
 import Set exposing (Set)
-import TestData exposing (passwordDict, userDict)
+import TestData exposing (passwordDict, userDict, userInfo1)
 import User exposing (PasswordDict, User, UserDict, UserInfo, Username)
 import UserData
 
@@ -73,7 +74,16 @@ updateFromFrontend clientId msg model =
         SendSignInInfo username password ->
             case User.validateUser model.passwordDict username password of
                 True ->
-                    ( model, sendToFrontend clientId <| SendValidatedUser (User.fromDict model.userDict username) )
+                    let
+                        ( fD, newUserDict ) =
+                            updateFrequencyDictionary username model.userDict
+                    in
+                    ( { model | userDict = newUserDict }
+                    , Cmd.batch
+                        [ sendToFrontend clientId <| SendValidatedUser (User.fromDict model.userDict username)
+                        , sendToFrontend clientId <| SendFrequencyDict fD
+                        ]
+                    )
 
                 False ->
                     ( model, sendToFrontend clientId <| SendValidatedUser Nothing )
@@ -174,3 +184,20 @@ userList : UserDict Note -> List User
 userList userDict =
     List.map (User.fromDict userDict) (Dict.keys userDict)
         |> Maybe.Extra.values
+
+
+updateFrequencyDictionary : Username -> UserDict Note -> ( FrequencyDict, UserDict Note )
+updateFrequencyDictionary username userDict =
+    case Dict.get username userDict of
+        Nothing ->
+            ( Dict.empty, userDict )
+
+        Just userInfo ->
+            let
+                fD =
+                    Note.frequencies userInfo.data
+
+                newUserInfo =
+                    { userInfo | tagDict = fD }
+            in
+            ( fD, Dict.insert username newUserInfo userDict )
