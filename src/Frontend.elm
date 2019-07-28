@@ -459,7 +459,7 @@ update msg model =
         SetTagForSearch tag ->
             let
                 selectedNotes =
-                    selectNotes model
+                    selectNotes { model | tagFilterString = tag }
             in
             ( { model
                 | tagFilterString = tag
