@@ -424,6 +424,9 @@ update msg model =
         GotTagFilter str ->
             ( { model | tagFilterString = str }, Cmd.none )
 
+        SetTagForSearch tag ->
+            ( { model | tagFilterString = tag }, Cmd.none )
+
         GotNoteDateAfterFilter str ->
             ( { model | noteCameAfterString = str }, Cmd.none )
 
@@ -1095,8 +1098,24 @@ viewNotes model =
         , row [ spacing 24, alignBottom, alignLeft ]
             [ el [ moveLeft 10, Font.size 16, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length notes))
             ]
-        , el [ Font.size 12 ] (text <| "Tags: " ++ FrequencyDict.asString 10 model.frequencyDict)
+        , tagButtons model
         ]
+
+
+tagButtons : Model -> Element FrontendMsg
+tagButtons model =
+    model.frequencyDict
+        |> FrequencyDict.list
+        |> List.map (\item -> tagButton item)
+        |> (\x -> row [ spacing 8, Font.size 14 ] x)
+
+
+tagButton : ( String, Int ) -> Element FrontendMsg
+tagButton ( tag, freq ) =
+    Input.button (Style.titleButton False)
+        { onPress = Just (SetTagForSearch tag)
+        , label = text (tag ++ ": " ++ String.fromInt freq)
+        }
 
 
 selectNoteButton : Maybe Note -> Note -> Element FrontendMsg
