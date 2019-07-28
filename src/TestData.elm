@@ -62,7 +62,7 @@ n2 =
     { id = 2
     , subject = "BBB"
     , body = "Also a test"
-    , tags = [ "foo" ]
+    , tags = []
     , timeCreated = Time.millisToPosix 1563454248000
     , timeModified = Time.millisToPosix 1563454248000
     }

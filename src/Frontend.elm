@@ -1059,8 +1059,21 @@ viewNote maybeNote =
                 title =
                     "# " ++ note.subject ++ "\n\n"
 
+                tags =
+                    case note.tags of
+                        [] ->
+                            "Tags: none\n\n"
+
+                        _ ->
+                            "**Tags:** " ++ String.join ", " note.tags ++ "\n\n"
+
+                hr =
+                    """<hr style="height:1px; border:none; background-color: #333;" />
+
+"""
+
                 content =
-                    title ++ created ++ modified ++ note.body
+                    title ++ created ++ modified ++ tags ++ hr ++ note.body
             in
             column [ padding 20, spacing 12, height (px 450), width (px 350), Border.width 1 ]
                 [ toMarkdown content |> Element.html
@@ -1201,6 +1214,8 @@ markdownStyle =
     , HA.style "overflow-y" "scroll"
     , HA.style "white-space" "normal"
     , HA.style "line-height" "1.4"
+    , HA.class "hr-thin"
+    , HA.class "image"
 
     -- , HA.style "p" "display: inline-block"
     ]
