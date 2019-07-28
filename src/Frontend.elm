@@ -68,6 +68,8 @@ type alias Model =
     , counter : Int
     , currentTime : Posix
     , bodyDebouncer : Debounce String
+    , subjectDebouncer : Debounce String
+    , tagDebouncer : Debounce String
 
     -- USER
     , currentUser : Maybe User
@@ -107,6 +109,8 @@ initialModel =
     , currentTime = Time.millisToPosix 0
     , counter = 0
     , bodyDebouncer = Debounce.init
+    , subjectDebouncer = Debounce.init
+    , tagDebouncer = Debounce.init
 
     -- ADMIN
     , -- USER
@@ -192,10 +196,24 @@ updateFromBackend msg model =
                     )
 
 
-debounceConfig : Debounce.Config FrontendMsg
-debounceConfig =
+bodyDebounceConfig : Debounce.Config FrontendMsg
+bodyDebounceConfig =
     { strategy = Debounce.later 1000
     , transform = DebounceBody
+    }
+
+
+subjectDebounceConfig : Debounce.Config FrontendMsg
+subjectDebounceConfig =
+    { strategy = Debounce.later 1000
+    , transform = DebounceSubject
+    }
+
+
+tagDebounceConfig : Debounce.Config FrontendMsg
+tagDebounceConfig =
+    { strategy = Debounce.later 1000
+    , transform = DebounceTags
     }
 
 
@@ -218,10 +236,50 @@ update msg model =
 
                 ( debounce, cmd ) =
                     Debounce.update
-                        debounceConfig
+                        bodyDebounceConfig
                         (Debounce.takeLast save)
                         msg_
                         model.bodyDebouncer
+            in
+            ( model, cmd )
+
+        DebounceSubject msg_ ->
+            -- YYY
+            let
+                save =
+                    case model.maybeCurrentNote of
+                        Nothing ->
+                            \s -> Cmd.none
+
+                        Just note ->
+                            \s -> sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s })
+
+                ( debounce, cmd ) =
+                    Debounce.update
+                        subjectDebounceConfig
+                        (Debounce.takeLast save)
+                        msg_
+                        model.subjectDebouncer
+            in
+            ( model, cmd )
+
+        DebounceTags msg_ ->
+            -- YYY
+            let
+                save =
+                    case model.maybeCurrentNote of
+                        Nothing ->
+                            \s -> Cmd.none
+
+                        Just note ->
+                            \s -> sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | tags = Note.tagsFromString s })
+
+                ( debounce, cmd ) =
+                    Debounce.update
+                        tagDebounceConfig
+                        (Debounce.takeLast save)
+                        msg_
+                        model.tagDebouncer
             in
             ( model, cmd )
 
@@ -452,29 +510,50 @@ update msg model =
         GotNewNoteName str ->
             ( { model | newSubject = str }, Cmd.none )
 
-        GotTagString str ->
-            ( { model | tagString = str }, Cmd.none )
+        GotTagString tagString ->
+            let
+                ( newDebouncer, cmd ) =
+                    Debounce.push
+                        tagDebounceConfig
+                        tagString
+                        model.tagDebouncer
+            in
+            ( { model
+                | tagDebouncer = newDebouncer
+                , tagString = tagString
+              }
+            , cmd
+            )
 
         GotNoteBody noteBody ->
             -- YYY
             let
                 ( newDebouncer, cmd ) =
                     Debounce.push
-                        debounceConfig
+                        bodyDebounceConfig
                         noteBody
                         model.bodyDebouncer
             in
             ( { model
                 | noteBody = noteBody
                 , bodyDebouncer = newDebouncer
-
-                -- , maybeCurrentNote = Just updatedNote_
               }
             , cmd
             )
 
-        GotChangedSubject str ->
-            ( { model | changedSubject = str }, Cmd.none )
+        GotChangedSubject subject ->
+            let
+                ( newDebouncer, cmd ) =
+                    Debounce.push
+                        subjectDebounceConfig
+                        subject
+                        model.subjectDebouncer
+            in
+            ( { model
+                | subjectDebouncer = newDebouncer
+              }
+            , cmd
+            )
 
 
 

@@ -50,6 +50,8 @@ type BackendMsg
 type FrontendMsg
     = FENoop
     | DebounceBody Debounce.Msg
+    | DebounceSubject Debounce.Msg
+    | DebounceTags Debounce.Msg
       -- Admin
     | SendUsers
       -- App
