@@ -1209,7 +1209,7 @@ displayShiftedDate kDaysAgoString today =
 
 
 inputNoteNameFilter model =
-    Input.text (Style.inputStyle 200)
+    Input.text (Style.inputStyle 160)
         { onChange = GotNoteFilter
         , text = model.noteFilterString
         , placeholder = Nothing
@@ -1218,7 +1218,7 @@ inputNoteNameFilter model =
 
 
 inputTextFilter model =
-    Input.text (Style.inputStyle 200)
+    Input.text (Style.inputStyle 160)
         { onChange = GotTextFilter
         , text = model.textFilterString
         , placeholder = Nothing
@@ -1227,7 +1227,7 @@ inputTextFilter model =
 
 
 inputTagFilter model =
-    Input.text (Style.inputStyle 200)
+    Input.text (Style.inputStyle 80)
         { onChange = GotTagFilter
         , text = model.tagFilterString
         , placeholder = Nothing
