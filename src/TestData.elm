@@ -23,7 +23,7 @@ userDict =
 
 userInfo1 : UserInfo Note
 userInfo1 =
-    { email = "jxxcarlson@gmail.com", admin = True, counter = 2, data = [ n1, n2 ] }
+    { email = "jxxcarlson@gmail.com", admin = True, counter = 2, tagDict = Dict.empty, data = [ n1, n2 ] }
 
 
 n1 : Note

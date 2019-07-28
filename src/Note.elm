@@ -1,5 +1,18 @@
-module Note exposing (Note, bigDateFilter, filter, filterByTag, filterText, kDaysAgo, make, remove, replace, tagsFromString)
+module Note exposing
+    ( Note
+    , bigDateFilter
+    , filter
+    , filterByTag
+    , filterText
+    , kDaysAgo
+    , make
+    , noteFrequencies
+    , remove
+    , replace
+    , tagsFromString
+    )
 
+import FrequencyDict exposing (FrequencyDict)
 import List.Extra
 import Time exposing (Posix)
 
@@ -149,3 +162,8 @@ tagsFromString str =
     str
         |> String.split ","
         |> List.map String.trim
+
+
+noteFrequencies : List Note -> FrequencyDict
+noteFrequencies noteList =
+    FrequencyDict.make (List.map .tags noteList |> List.concat)

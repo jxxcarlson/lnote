@@ -16,6 +16,7 @@ module User exposing
     )
 
 import Dict exposing (Dict)
+import FrequencyDict exposing (FrequencyDict)
 
 
 type alias Username =
@@ -35,7 +36,7 @@ type alias UserDict a =
 
 
 type alias UserInfo a =
-    { email : String, admin : Bool, counter : Int, data : List a }
+    { email : String, admin : Bool, counter : Int, tagDict : FrequencyDict, data : List a }
 
 
 type alias User =
@@ -139,7 +140,7 @@ add username password email ( passwordDict, userDict ) =
                     Dict.insert username (encrypt password) passwordDict
 
                 newUserInfo =
-                    { email = email, admin = False, counter = 0, data = [] }
+                    { email = email, admin = False, counter = 0, data = [], tagDict = Dict.empty }
 
                 newUserDict =
                     Dict.insert username newUserInfo userDict
