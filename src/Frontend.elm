@@ -962,7 +962,7 @@ viewNotes model =
                 --   }
                 , { header = el [ Font.bold ] (text "Subject")
                   , width = px 220
-                  , view = \k note -> selectNoteButton note
+                  , view = \k note -> selectNoteButton model.maybeCurrentNote note
                   }
                 ]
             }
@@ -972,11 +972,11 @@ viewNotes model =
         ]
 
 
-selectNoteButton : Note -> Element FrontendMsg
-selectNoteButton note =
-    Input.button Style.listItemButton
-        { onPress = Just <| SetCurrentNote note
-        , label = el [ Font.size 12, Font.color Style.darkBlue ] (text note.subject)
+selectNoteButton : Maybe Note -> Note -> Element FrontendMsg
+selectNoteButton maybeCurrentNote note =
+    Input.button (Style.titleButton (maybeCurrentNote == Just note))
+        { onPress = Just (SetCurrentNote note)
+        , label = text note.subject
         }
 
 
