@@ -551,6 +551,7 @@ update msg model =
             in
             ( { model
                 | subjectDebouncer = newDebouncer
+                , changedSubject = subject
               }
             , cmd
             )
@@ -988,8 +989,8 @@ newNoteButton =
 updateNoteButton : Element FrontendMsg
 updateNoteButton =
     Input.button Style.button
-        { onPress = Just DoUpdateNote
-        , label = Element.text "Save"
+        { onPress = Just FENoop
+        , label = Element.text "Subject"
         }
 
 
@@ -1036,7 +1037,7 @@ inputNoteTags model =
 
 
 inputChangedSubject model =
-    Input.text (Style.inputStyle 250)
+    Input.text (Style.inputStyle 230)
         { onChange = GotChangedSubject
         , text = model.changedSubject
         , placeholder = Nothing
