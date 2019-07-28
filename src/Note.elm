@@ -1,4 +1,4 @@
-module Note exposing (Note, bigDateFilter, filter, filterText, kDaysAgo, make, remove, replace, tagsFromString)
+module Note exposing (Note, bigDateFilter, filter, filterByTag, filterText, kDaysAgo, make, remove, replace, tagsFromString)
 
 import List.Extra
 import Time exposing (Posix)
@@ -84,6 +84,20 @@ filterText filterString notes =
                     String.contains (String.toLower str) (String.toLower note.body)
             in
             List.filter (\note -> textFilter filterString note) notes
+
+
+filterByTag : String -> List Note -> List Note
+filterByTag tag notes =
+    case tag of
+        "" ->
+            notes
+
+        _ ->
+            let
+                tagFilter tag_ note =
+                    List.member (String.toLower tag_) note.tags
+            in
+            List.filter (\note -> tagFilter tag note) notes
 
 
 dateSuffixFilter : Posix -> Int -> List Note -> List Note

@@ -82,6 +82,7 @@ type FrontendMsg
     | GotNoteDateAfterFilter String
     | GotNoteFilter String
     | GotTextFilter String
+    | GotTagFilter String
     | SetDeleteNoteSafety DeleteNoteSafety
 
 

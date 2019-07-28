@@ -85,6 +85,7 @@ type alias Model =
     , tagString : String
     , noteFilterString : String
     , textFilterString : String
+    , tagFilterString : String
     , noteCameBeforeString : String
     , noteCameAfterString : String
     , deleteNoteSafety : DeleteNoteSafety
@@ -123,6 +124,7 @@ initialModel =
     , changedSubject = ""
     , noteFilterString = ""
     , textFilterString = ""
+    , tagFilterString = ""
     , deleteNoteSafety = DeleteNoteSafetyOn
     , noteCameBeforeString = ""
     , noteCameAfterString = ""
@@ -322,6 +324,9 @@ update msg model =
 
         GotTextFilter str ->
             ( { model | textFilterString = str }, Cmd.none )
+
+        GotTagFilter str ->
+            ( { model | tagFilterString = str }, Cmd.none )
 
         GotNoteDateAfterFilter str ->
             ( { model | noteCameAfterString = str }, Cmd.none )
@@ -939,6 +944,7 @@ viewNotes model =
             Note.bigDateFilter today model.noteCameBeforeString model.noteCameAfterString model.notes
                 |> Note.filter model.noteFilterString
                 |> Note.filterText model.textFilterString
+                |> Note.filterByTag model.tagFilterString
     in
     column [ spacing 12, padding 20, height (px 430) ]
         [ el [ Font.size 16, Font.bold ] (text "Notes")
@@ -1157,14 +1163,19 @@ viewNote maybeNote =
 
 
 filterPanel model =
-    row [ spacing 24 ]
-        [ row [ spacing 8 ]
-            [ el [ Font.bold ] (text "Filter subject:")
+    row [ spacing 12 ]
+        [ el [ Font.bold ] (text "Filter by")
+        , row [ spacing 8 ]
+            [ el [ Font.bold ] (text "subject:")
             , inputNoteNameFilter model
             ]
         , row [ spacing 8 ]
-            [ el [ Font.bold ] (text "Filter body:")
+            [ el [ Font.bold ] (text "text:")
             , inputTextFilter model
+            ]
+        , row [ spacing 8 ]
+            [ el [ Font.bold ] (text "tag:")
+            , inputTagFilter model
             ]
         ]
 
@@ -1210,6 +1221,15 @@ inputTextFilter model =
     Input.text (Style.inputStyle 200)
         { onChange = GotTextFilter
         , text = model.textFilterString
+        , placeholder = Nothing
+        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
+        }
+
+
+inputTagFilter model =
+    Input.text (Style.inputStyle 200)
+        { onChange = GotTagFilter
+        , text = model.tagFilterString
         , placeholder = Nothing
         , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
         }
