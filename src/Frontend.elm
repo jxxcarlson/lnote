@@ -10,7 +10,7 @@ import Array exposing (map)
 import Browser exposing (UrlRequest(..))
 import Browser.Dom as Dom
 import DateTime
-import Debounce
+import Debounce exposing (Debounce)
 import Dict
 import Element exposing (..)
 import Element.Background as Background
@@ -67,6 +67,7 @@ type alias Model =
     , message : String
     , counter : Int
     , currentTime : Posix
+    , bodyDebouncer : Debounce String
 
     -- USER
     , currentUser : Maybe User
@@ -105,6 +106,7 @@ initialModel =
     , appMode = UserValidation SignInState
     , currentTime = Time.millisToPosix 0
     , counter = 0
+    , bodyDebouncer = Debounce.init
 
     -- ADMIN
     , -- USER
@@ -190,11 +192,38 @@ updateFromBackend msg model =
                     )
 
 
+debounceConfig : Debounce.Config FrontendMsg
+debounceConfig =
+    { strategy = Debounce.later 1000
+    , transform = DebounceBody
+    }
+
+
 update : FrontendMsg -> Model -> ( Model, Cmd FrontendMsg )
 update msg model =
     case msg of
         FENoop ->
             ( model, Cmd.none )
+
+        DebounceBody msg_ ->
+            -- YYY
+            let
+                save =
+                    case model.maybeCurrentNote of
+                        Nothing ->
+                            \s -> Cmd.none
+
+                        Just note ->
+                            \s -> sendToBackend timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s })
+
+                ( debounce, cmd ) =
+                    Debounce.update
+                        debounceConfig
+                        (Debounce.takeLast save)
+                        msg_
+                        model.bodyDebouncer
+            in
+            ( model, cmd )
 
         TimeChange t ->
             ( { model | currentTime = t }, Cmd.none )
@@ -381,6 +410,7 @@ update msg model =
                     )
 
         DoUpdateNote ->
+            -- YYY
             case model.maybeCurrentNote of
                 Nothing ->
                     ( model, Cmd.none )
@@ -425,17 +455,23 @@ update msg model =
         GotTagString str ->
             ( { model | tagString = str }, Cmd.none )
 
-        GotNoteBody str ->
+        GotNoteBody noteBody ->
+            -- YYY
             let
-                updatedNote_ =
-                    case model.maybeCurrentNote of
-                        Just note ->
-                            { note | body = str }
-
-                        Nothing ->
-                            Note.make -1 "???" str model.currentTime
+                ( newDebouncer, cmd ) =
+                    Debounce.push
+                        debounceConfig
+                        noteBody
+                        model.bodyDebouncer
             in
-            ( { model | noteBody = str, maybeCurrentNote = Just updatedNote_ }, Cmd.none )
+            ( { model
+                | noteBody = noteBody
+                , bodyDebouncer = newDebouncer
+
+                -- , maybeCurrentNote = Just updatedNote_
+              }
+            , cmd
+            )
 
         GotChangedSubject str ->
             ( { model | changedSubject = str }, Cmd.none )

@@ -10,6 +10,7 @@ module Msg exposing
     )
 
 import Browser exposing (UrlRequest(..))
+import Debounce
 import Lamdera.Types exposing (ClientId, WsError)
 import Note exposing (Note)
 import Time exposing (Posix)
@@ -48,6 +49,7 @@ type BackendMsg
 
 type FrontendMsg
     = FENoop
+    | DebounceBody Debounce.Msg
       -- Admin
     | SendUsers
       -- App
