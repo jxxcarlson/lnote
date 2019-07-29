@@ -432,11 +432,26 @@ update msg model =
             let
                 selectedNotes =
                     selectNotes model
+
+                maybeCurrentNote =
+                    List.head selectedNotes
+
+                newModel =
+                    case maybeCurrentNote of
+                        Nothing ->
+                            model
+
+                        Just note ->
+                            { model
+                                | noteBody = note.body
+                                , changedSubject = note.subject
+                                , tagString = String.join ", " note.tags
+                            }
             in
-            ( { model
+            ( { newModel
                 | noteFilterString = str
                 , selectedNotes = selectedNotes
-                , maybeCurrentNote = List.head selectedNotes
+                , maybeCurrentNote = maybeCurrentNote
               }
             , Cmd.none
             )
@@ -445,11 +460,26 @@ update msg model =
             let
                 selectedNotes =
                     selectNotes model
+
+                maybeCurrentNote =
+                    List.head selectedNotes
+
+                newModel =
+                    case maybeCurrentNote of
+                        Nothing ->
+                            model
+
+                        Just note ->
+                            { model
+                                | noteBody = note.body
+                                , changedSubject = note.subject
+                                , tagString = String.join ", " note.tags
+                            }
             in
-            ( { model
+            ( { newModel
                 | textFilterString = str
                 , selectedNotes = selectedNotes
-                , maybeCurrentNote = List.head selectedNotes
+                , maybeCurrentNote = maybeCurrentNote
               }
             , Cmd.none
             )
@@ -458,11 +488,26 @@ update msg model =
             let
                 selectedNotes =
                     selectNotes model
+
+                maybeCurrentNote =
+                    List.head selectedNotes
+
+                newModel =
+                    case maybeCurrentNote of
+                        Nothing ->
+                            model
+
+                        Just note ->
+                            { model
+                                | noteBody = note.body
+                                , changedSubject = note.subject
+                                , tagString = String.join ", " note.tags
+                            }
             in
-            ( { model
+            ( { newModel
                 | tagFilterString = str
                 , selectedNotes = selectedNotes
-                , maybeCurrentNote = List.head selectedNotes
+                , maybeCurrentNote = maybeCurrentNote
               }
             , Cmd.none
             )
