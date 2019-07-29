@@ -1181,7 +1181,7 @@ tagButtons model =
     model.frequencyDict
         |> FrequencyDict.list
         |> List.map (\item -> tagButton item)
-        |> List.take 15
+        |> List.take 20
         |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
         |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (px (2 * config.panelWidth - 40)) ] x)
 
