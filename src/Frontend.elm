@@ -471,11 +471,26 @@ update msg model =
             let
                 selectedNotes =
                     selectNotes { model | tagFilterString = tag }
+
+                maybeCurrentNote =
+                    List.head selectedNotes
+
+                newModel =
+                    case maybeCurrentNote of
+                        Nothing ->
+                            model
+
+                        Just note ->
+                            { model
+                                | noteBody = note.body
+                                , changedSubject = note.subject
+                                , tagString = String.join ", " note.tags
+                            }
             in
-            ( { model
+            ( { newModel
                 | tagFilterString = tag
                 , selectedNotes = selectedNotes
-                , maybeCurrentNote = List.head selectedNotes
+                , maybeCurrentNote = maybeCurrentNote
               }
             , Cmd.none
             )
