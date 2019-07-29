@@ -103,6 +103,9 @@ type alias Model =
 --
 -- INIT
 --
+--
+-- CONFIG
+--
 
 
 config =
@@ -713,6 +716,13 @@ userValidationView model =
 
 noUserView : Model -> Element FrontendMsg
 noUserView model =
+    row [ spacing 12 ]
+        [ noUserLHS model
+        , noUserRHS model
+        ]
+
+
+noUserLHS model =
     column Style.mainColumnX
         [ el [ Font.size 18, Font.bold, paddingXY 0 12 ] (text "Welcome!")
         , inputUserName model
@@ -727,6 +737,26 @@ noUserView model =
                 ]
             ]
         , el [ Font.size 12 ] (text model.message)
+        ]
+
+
+noUserRHS model =
+    column [ padding 40, spacing 18, Font.size 16 ]
+        [ el [ Font.bold, Font.size 24 ]
+            (text "Screenshot of app")
+        , image
+            [ width (px config.panelWidth) ]
+            { src = "http://noteimages.s3.amazonaws.com/jim_images/notes-screen.png"
+            , description = "screenshot of app"
+            }
+        , Element.paragraph []
+            [ el [ Font.bold ] (text "Features. ")
+            , text "Searchable note repository. Supports Markdown. Filter notes by title, tags, full text. "
+            ]
+        , Element.paragraph []
+            [ el [ Font.bold ] (text "Coming soon. ")
+            , text "Fiter by date, export."
+            ]
         ]
 
 
