@@ -757,7 +757,7 @@ noUserRHS model =
             ]
         , Element.paragraph []
             [ el [ Font.bold ] (text "Coming soon. ")
-            , text "Fiter by date, options to sort note list; export."
+            , text "Filter by date, options to sort note list; export."
             ]
         ]
 
