@@ -635,7 +635,8 @@ view model =
 mainView : Model -> Element FrontendMsg
 mainView model =
     column [ height fill ]
-        [ header model
+        [ Html.node "link" [ HA.rel "stylesheet", HA.href "mystyle.css" ] [] |> Element.html
+        , header model
         , case model.appMode of
             UserValidation _ ->
                 userValidationView model

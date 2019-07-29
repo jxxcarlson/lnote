@@ -41,6 +41,8 @@ someText =
     """
 This is a test.  **I repeat:** a test.
 
+![Hummingbird](https://3c1703fe8d.site.internapcdn.net/newman/csz/news/800/2018/divebombingf.jpg)
+
 [New York Times](http://nytimes.com)
 
 <img src="https://3c1703fe8d.site.internapcdn.net/newman/csz/news/800/2018/divebombingf.jpg" style="width:300px;"  />
