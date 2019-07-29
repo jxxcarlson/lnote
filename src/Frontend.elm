@@ -1489,7 +1489,7 @@ myOptions =
 
 markdownStyle =
     [ HA.style "font-size" "14px"
-    , HA.style "width" (String.fromInt (config.panelWidth - 30) ++ "px")
+    , HA.style "width" (String.fromInt (config.panelWidth - 40) ++ "px")
     , HA.style "overflow-y" "scroll"
     , HA.style "white-space" "normal"
     , HA.style "line-height" "1.4"
