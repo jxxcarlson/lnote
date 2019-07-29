@@ -540,6 +540,16 @@ update msg model =
             , Cmd.none
             )
 
+        ClearAllSearches ->
+            ( { model
+                | selectedNotes = model.notes
+                , noteFilterString = ""
+                , textFilterString = ""
+                , tagFilterString = ""
+              }
+            , Cmd.none
+            )
+
         GotNoteDateAfterFilter str ->
             ( { model | noteCameAfterString = str, selectedNotes = selectNotes model }, Cmd.none )
 
@@ -1262,6 +1272,14 @@ clearTagSearch =
         }
 
 
+clearAllSearches : Element FrontendMsg
+clearAllSearches =
+    Input.button Style.smallButton
+        { onPress = Just ClearAllSearches
+        , label = text "Clear searches"
+        }
+
+
 selectNoteButton : Maybe Note -> Note -> Element FrontendMsg
 selectNoteButton maybeCurrentNote note =
     Input.button (Style.titleButton (maybeCurrentNote == Just note))
@@ -1453,6 +1471,7 @@ filterPanel model =
             [ el [ Font.bold ] (text "tag:")
             , inputTagFilter model
             ]
+        , clearAllSearches
         ]
 
 

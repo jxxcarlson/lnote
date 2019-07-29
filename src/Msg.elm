@@ -91,6 +91,7 @@ type FrontendMsg
     | GotTextFilter String
     | GotTagFilter String
     | SetTagForSearch String
+    | ClearAllSearches
     | SetDeleteNoteSafety DeleteNoteSafety
 
 
