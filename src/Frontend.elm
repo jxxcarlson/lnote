@@ -112,7 +112,7 @@ config =
     { debounceInterval = 500
     , timeoutInMs = 5 * 1000
     , panelHeight = 550
-    , panelWidth = 400
+    , panelWidth = 450
     }
 
 
