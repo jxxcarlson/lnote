@@ -545,6 +545,7 @@ update msg model =
                             { note
                                 | subject = model.changedSubject
                                 , body = model.noteBody
+                                , timeModified = model.currentTime
                                 , tags = Note.tagsFromString model.tagString
                             }
                     in
