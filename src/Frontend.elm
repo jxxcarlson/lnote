@@ -753,6 +753,7 @@ noUserRHS model =
         , Element.paragraph []
             [ el [ Font.bold ] (text "Features. ")
             , text "Searchable note repository. Supports Markdown. Filter notes by title, tags, full text. "
+            , text "Active links to the most-used tags"
             ]
         , Element.paragraph []
             [ el [ Font.bold ] (text "Coming soon. ")
