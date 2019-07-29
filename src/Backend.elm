@@ -168,6 +168,21 @@ updateFromFrontend clientId msg model =
                             ( model, Cmd.none )
 
                         Ok ( note_, userDict ) ->
+                            ( { model | userDict = userDict }
+                            , sendToFrontend clientId (SendNoteToFrontend note_)
+                            )
+
+        UpdateTags maybeUsername note ->
+            case maybeUsername of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just user ->
+                    case UserData.update user.username note model.userDict of
+                        Err _ ->
+                            ( model, Cmd.none )
+
+                        Ok ( note_, userDict ) ->
                             let
                                 ( fD, newUserDict ) =
                                     updateFrequencyDictionary user.username userDict

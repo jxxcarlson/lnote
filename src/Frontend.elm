@@ -291,7 +291,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | tags = Note.tagsFromString s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateTags model.currentUser { note | tags = Note.tagsFromString s })
 
                         _ ->
                             \s -> Cmd.none

@@ -32,6 +32,7 @@ type ToBackend
     | RequestNotes (Maybe User)
     | DeleteNote (Maybe User) Note
     | UpdateNote (Maybe User) Note
+    | UpdateTags (Maybe User) Note
 
 
 type ToFrontend
