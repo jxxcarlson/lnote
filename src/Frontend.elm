@@ -251,7 +251,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s, timeModified = model.currentTime })
 
                         _ ->
                             \s -> Cmd.none
@@ -271,7 +271,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s, timeModified = model.currentTime })
 
                         _ ->
                             \s -> Cmd.none
@@ -291,7 +291,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateTags model.currentUser { note | tags = Note.tagsFromString s })
+                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateTags model.currentUser { note | tags = Note.tagsFromString s, timeModified = model.currentTime })
 
                         _ ->
                             \s -> Cmd.none
