@@ -1,14 +1,20 @@
 module Note exposing
     ( Note
+    , applyBodyFilter
+    , applySubjectFilter
+    , applyTagFilter
     , bigDateFilter
     , filter
     , filterByTag
     , filterText
+    , firstSelectedNote
     , frequencies
     , kDaysAgo
     , make
     , remove
     , replace
+    , select
+    , selectAll
     , tagsFromString
     )
 
@@ -24,6 +30,7 @@ type alias Note =
     , body : String
     , timeCreated : Posix
     , timeModified : Posix
+    , selected : Bool
     }
 
 
@@ -35,6 +42,7 @@ make id subject body posix =
     , body = body
     , timeCreated = posix
     , timeModified = posix
+    , selected = True
     }
 
 
@@ -118,8 +126,16 @@ dateSuffixFilter today k noteList =
     let
         kDaysAgo_ =
             kDaysAgo k today
+
+        f : Note -> Bool
+        f note =
+            posixInterval note.timeCreated kDaysAgo_ >= 0
+
+        select_ : Note -> Note
+        select_ note =
+            { note | selected = f note }
     in
-    List.filter (\note -> posixInterval note.timeCreated kDaysAgo_ >= 0) noteList
+    List.map select_ noteList
 
 
 datePrefixFilter : Posix -> Int -> List Note -> List Note
@@ -127,8 +143,16 @@ datePrefixFilter today k noteList =
     let
         kDaysAgo_ =
             kDaysAgo k today
+
+        f : Note -> Bool
+        f note =
+            posixInterval kDaysAgo_ note.timeCreated >= -1
+
+        select_ : Note -> Note
+        select_ note =
+            { note | selected = f note }
     in
-    List.filter (\note -> posixInterval kDaysAgo_ note.timeCreated >= -1) noteList
+    List.map select_ noteList
 
 
 shiftPosix : Float -> Posix -> Posix
@@ -167,3 +191,61 @@ tagsFromString str =
 frequencies : List Note -> FrequencyDict
 frequencies noteList =
     FrequencyDict.make (List.map .tags noteList |> List.concat)
+
+
+selectAll : List Note -> List Note
+selectAll noteList =
+    noteList
+        |> List.map (\note -> { note | selected = True })
+
+
+select : Note -> Note
+select note =
+    { note | selected = True }
+
+
+applySubjectFilter : String -> List Note -> List Note
+applySubjectFilter str noteList =
+    let
+        f : Note -> Bool
+        f note =
+            String.contains (String.toLower str) (String.toLower note.subject)
+
+        select_ : Note -> Note
+        select_ note =
+            { note | selected = f note }
+    in
+    List.map select_ noteList
+
+
+applyBodyFilter : String -> List Note -> List Note
+applyBodyFilter str noteList =
+    let
+        f : Note -> Bool
+        f note =
+            String.contains (String.toLower str) (String.toLower note.body)
+
+        select_ : Note -> Note
+        select_ note =
+            { note | selected = f note }
+    in
+    List.map select_ noteList
+
+
+applyTagFilter : String -> List Note -> List Note
+applyTagFilter str noteList =
+    let
+        f : Note -> Bool
+        f note =
+            List.member (String.toLower str) note.tags
+
+        select_ : Note -> Note
+        select_ note =
+            { note | selected = f note }
+    in
+    List.map select_ noteList
+
+
+firstSelectedNote : List Note -> Maybe Note
+firstSelectedNote noteList =
+    List.filter (\note -> note.selected) noteList |> List.head

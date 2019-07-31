@@ -34,6 +34,7 @@ n1 =
     , tags = [ "foo", "bar" ]
     , timeCreated = Time.millisToPosix 1563424248000
     , timeModified = Time.millisToPosix 1563424248000
+    , selected = True
     }
 
 
@@ -49,7 +50,7 @@ This is a test.  **I repeat:** a test.
 
 ## Some Latin
 
-orem ipsum dolor sit amet, tellus metus non convallis quis, bibendum tortor convallis, maecenas vel donec libero, dui donec nulla turpis. Commodo laoreet, amet sit vivamus mi. Neque diam a sed. Donec ut in dui, ipsum urna, magna commodo eu nulla, odio nonummy vel donec. Pede neque mauris imperdiet congue dictum, ultricies ipsum rutrum a arcu, scelerisque justo lectus lacus. Velit nulla nibh ante porttitor, volutpat congue turpis mauris nulla, in ligula nunc et ut lacus, vel congue turpis enim, ultricies vestibulum mauris cras arcu pulvinar.
+Lorem ipsum dolor sit amet, tellus metus non convallis quis, bibendum tortor convallis, maecenas vel donec libero, dui donec nulla turpis. Commodo laoreet, amet sit vivamus mi. Neque diam a sed. Donec ut in dui, ipsum urna, magna commodo eu nulla, odio nonummy vel donec. Pede neque mauris imperdiet congue dictum, ultricies ipsum rutrum a arcu, scelerisque justo lectus lacus. Velit nulla nibh ante porttitor, volutpat congue turpis mauris nulla, in ligula nunc et ut lacus, vel congue turpis enim, ultricies vestibulum mauris cras arcu pulvinar.
 
 Duis bibendum, fusce donec amet ipsum sagittis, luctus porta, a eu vitae convallis metus sodales imperdiet. Vitae erat, ultricies nec a, nulla interdum, donec ut risus, adipiscing wisi lorem pede leo arcu. Morbi semper tristique, luctus praesent massa, officiis nam sem ac. At nascetur sagittis pellentesque et posuere eget, tincidunt suspendisse morbi ac magna ligula suspendisse, a eros leo hac nonummy porta diam. Et proin integer, pulvinar velit mollis, nisl vestibulum curabitur. Habitasse est, sodales cras id integer placerat sit, ac erat ut tincidunt suspendisse dolor. In montes nibh pellentesque congue, faucibus donec id, natoque mattis dictum dictumst class massa hendrerit, arcu tristique in sed, lacus feugiat. Nec lorem, mi interdum aliquam magna mattis, varius morbi nulla et ipsum malesuada a, velit turpis pretium. Metus sed imperdiet arcu, eleifend integer non a, elit velit amet non nascetur massa, est et nibh purus.
 
@@ -67,4 +68,5 @@ n2 =
     , tags = []
     , timeCreated = Time.millisToPosix 1563454248000
     , timeModified = Time.millisToPosix 1563454248000
+    , selected = True
     }
