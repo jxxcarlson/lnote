@@ -1404,7 +1404,7 @@ adminView_ model user =
                   , view = \k usr -> el [ Font.size 12 ] (text <| String.fromInt <| k + 1)
                   }
                 , { header = el [ Font.bold ] (text "Username")
-                  , width = px 80
+                  , width = px 130
                   , view = \k usr -> el [ Font.size 12 ] (text usr.username)
                   }
                 , { header = el [ Font.bold ] (text "Email")
