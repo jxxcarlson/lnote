@@ -10,17 +10,20 @@ module Note exposing
     , firstSelectedNote
     , frequencies
     , kDaysAgo
+    , listToYaml
     , make
     , remove
     , replace
     , select
     , selectAll
     , tagsFromString
+    , toYaml
     )
 
+import File.Download as Download
 import FrequencyDict exposing (FrequencyDict)
 import List.Extra
-import Time exposing (Posix)
+import Time exposing (Posix, toHour, toMinute, toSecond, utc)
 
 
 type alias Note =
@@ -32,6 +35,56 @@ type alias Note =
     , timeModified : Posix
     , selected : Bool
     }
+
+
+listToYaml : List Note -> String
+listToYaml noteList =
+    List.foldl (\note acc -> toYaml note ++ acc) "" noteList
+
+
+toYaml : Note -> String
+toYaml note =
+    "- id: "
+        ++ String.fromInt note.id
+        ++ "\n"
+        ++ "- subject: "
+        ++ note.subject
+        ++ "\n"
+        ++ "- tags: ["
+        ++ String.join ", " note.tags
+        ++ "]\n"
+        ++ "- timeCreated: "
+        ++ toUtcString note.timeCreated
+        ++ "\n"
+        ++ "- timeModified: "
+        ++ toUtcString note.timeModified
+        ++ "\n"
+        ++ "- selected: "
+        ++ stringFromBool note.selected
+        ++ "\n"
+        ++ "- body: "
+        ++ note.body
+        ++ "\n====\n\n"
+
+
+stringFromBool : Bool -> String
+stringFromBool bit =
+    case bit of
+        True ->
+            "True"
+
+        False ->
+            "False"
+
+
+toUtcString : Time.Posix -> String
+toUtcString time =
+    String.fromInt (toHour utc time)
+        ++ ":"
+        ++ String.fromInt (toMinute utc time)
+        ++ ":"
+        ++ String.fromInt (toSecond utc time)
+        ++ " (UTC)"
 
 
 make : Int -> String -> String -> Posix -> Note
