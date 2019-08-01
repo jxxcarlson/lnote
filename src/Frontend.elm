@@ -18,6 +18,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
+import File.Download as Download
 import FrequencyDict exposing (FrequencyDict)
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
@@ -413,6 +414,9 @@ update msg model =
             ( initialModel, Cmd.none )
 
         -- NOtE
+        DownloadNotes ->
+            ( model, downloadNotes model.notes )
+
         SetCurrentNote note ->
             ( { model
                 | maybeCurrentNote = Just note
@@ -762,6 +766,7 @@ activeFooter model =
         , hideIf (model.currentUser == Nothing) (editNoteButton model)
         , makeNewNoteButton model
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
+        , hideIf (model.currentUser == Nothing) downloadButton
         ]
 
 
@@ -1593,6 +1598,19 @@ type alias UpdateNoteRecord =
     , notes : List Note
     , cmd : Cmd FrontendMsg
     }
+
+
+downloadNotes : List Note -> Cmd FrontendMsg
+downloadNotes noteList =
+    Download.string "notes.yaml" "text/yaml" (Note.listToYaml noteList)
+
+
+downloadButton : Element FrontendMsg
+downloadButton =
+    Input.button Style.headerButton
+        { onPress = Just DownloadNotes
+        , label = el [] (text "Download")
+        }
 
 
 

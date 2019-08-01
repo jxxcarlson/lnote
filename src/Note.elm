@@ -20,7 +20,6 @@ module Note exposing
     , toYaml
     )
 
-import File.Download as Download
 import FrequencyDict exposing (FrequencyDict)
 import List.Extra
 import Time exposing (Posix, toHour, toMinute, toSecond, utc)
