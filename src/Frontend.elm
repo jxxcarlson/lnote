@@ -31,6 +31,7 @@ import Note exposing (Note)
 import Style
 import Task
 import TestData exposing (..)
+import Text
 import Time exposing (Posix)
 import TypedTime exposing (..)
 import Url exposing (Url)
@@ -66,6 +67,7 @@ app =
 type alias Model =
     { input : String
     , appMode : AppMode
+    , manualVisible : Bool
     , message : String
     , counter : Int
     , currentTime : Posix
@@ -120,6 +122,7 @@ initialModel =
     { input = "App started"
     , message = "Please sign in"
     , appMode = UserValidation SignInState
+    , manualVisible = False
     , currentTime = Time.millisToPosix 0
     , counter = 0
     , bodyDebouncer = Debounce.init
@@ -241,6 +244,9 @@ update msg model =
     case msg of
         FENoop ->
             ( model, Cmd.none )
+
+        SetManualVislble bit ->
+            ( { model | manualVisible = bit }, Cmd.none )
 
         DebounceBody msg_ ->
             -- YYY
@@ -767,6 +773,7 @@ activeFooter model =
         , makeNewNoteButton model
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
         , hideIf (model.currentUser == Nothing) downloadButton
+        , toggleManualButton model
         ]
 
 
@@ -1105,6 +1112,7 @@ masterView model =
             , showIf (model.appMode == UserNotes CreatingNote) (newNotePanel model)
             , showIf (model.appMode == UserNotes EditingNote) (editNotePanel model)
             , viewNote model.maybeCurrentNote
+            , showIf model.manualVisible manual
             ]
         ]
 
@@ -1644,6 +1652,45 @@ markdownStyle =
 toMarkdown : String -> Html FrontendMsg
 toMarkdown userInput =
     Markdown.toHtmlWith myOptions markdownStyle userInput
+
+
+
+--
+-- MANUAL
+--
+
+
+viewText : String -> Element FrontendMsg
+viewText str =
+    column
+        [ width (px config.panelWidth)
+        , height (px config.panelHeight)
+        , padding 20
+        , scrollbarY
+        , Border.width 1
+        ]
+        [ toMarkdown str |> Element.html ]
+
+
+manual : Element FrontendMsg
+manual =
+    viewText Text.manual
+
+
+toggleManualButton : Model -> Element FrontendMsg
+toggleManualButton model =
+    case model.manualVisible of
+        True ->
+            Input.button Style.button
+                { onPress = Just (SetManualVislble False)
+                , label = Element.text "Hide Manual"
+                }
+
+        False ->
+            Input.button Style.button
+                { onPress = Just (SetManualVislble True)
+                , label = Element.text "Show Manual"
+                }
 
 
 

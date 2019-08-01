@@ -61,6 +61,7 @@ type FrontendMsg
     | SetAppMode AppMode
     | SentToBackendResult (Result WsError ())
     | TimeChange Posix
+    | SetManualVislble Bool
       -- User
     | GotUserName String
     | GotPassword String
