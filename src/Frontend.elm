@@ -1278,7 +1278,7 @@ tagButtons model =
         |> List.take 20
         |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
         |> (\x -> x ++ [ clearTagSearch ])
-        |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (px (2 * config.panelWidth - 40)) ] x)
+        |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (px (2 * config.panelWidth - 60)) ] x)
 
 
 tagButton : ( String, Int ) -> Element FrontendMsg
