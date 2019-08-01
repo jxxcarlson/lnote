@@ -415,7 +415,7 @@ update msg model =
 
         -- NOtE
         DownloadNotes ->
-            ( model, downloadNotes model.notes )
+            ( model, downloadNotes (List.filter (\note -> note.selected) model.notes) )
 
         SetCurrentNote note ->
             ( { model
