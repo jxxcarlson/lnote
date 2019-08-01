@@ -23,6 +23,7 @@ import FrequencyDict exposing (FrequencyDict)
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Html.Attributes as HA
+import Keyboard
 import Lamdera.Frontend as Frontend
 import Lamdera.Types exposing (..)
 import Markdown
