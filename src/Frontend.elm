@@ -267,6 +267,7 @@ update msg model =
                                 |> setBrowsingModeUsingKey pressedKeys
                                 |> editNoteUsingKey pressedKeys
                                 |> makeNewNoteUsingKey pressedKeys
+                                |> sortByDateUsingKey pressedKeys
             in
             ( { newModel
                 | pressedKeys = pressedKeys
@@ -1502,6 +1503,15 @@ selectNotes model =
 --
 -- KEY COMMANDS
 --
+
+
+sortByDateUsingKey : List Key -> Model -> Model
+sortByDateUsingKey pressedKeys model =
+    if List.member (Character "U") pressedKeys then
+        { model | notes = Note.sortByTimeModified Note.SortIncreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+
+    else
+        model
 
 
 setBrowsingModeUsingKey : List Key -> Model -> Model

@@ -1,5 +1,6 @@
 module Note exposing
     ( Note
+    , SortDirection(..)
     , applyBodyFilter
     , applySubjectFilter
     , applyTagFilter
@@ -16,6 +17,7 @@ module Note exposing
     , replace
     , select
     , selectAll
+    , sortByTimeModified
     , tagsFromString
     , toYaml
     )
@@ -301,3 +303,28 @@ applyTagFilter str noteList =
 firstSelectedNote : List Note -> Maybe Note
 firstSelectedNote noteList =
     List.filter (\note -> note.selected) noteList |> List.head
+
+
+type SortDirection
+    = SortIncreasing
+    | SortDecreasing
+    | Unsorted
+
+
+sortByTimeModified : SortDirection -> List Note -> List Note
+sortByTimeModified sortDirection noteList =
+    case sortDirection of
+        SortIncreasing ->
+            List.sortBy (\note -> note.timeCreated |> Time.posixToMillis) noteList
+
+        SortDecreasing ->
+            -- let
+            --     negativePosixtoMillis : Posix -> Int
+            --     negativePosixtoMillis p =
+            --       -- Time.posixToMillis
+            --       --   -1 * Time.posixToMillis p
+            -- in
+            List.sortBy (\note -> note.timeCreated |> Time.posixToMillis) noteList
+
+        Unsorted ->
+            noteList
