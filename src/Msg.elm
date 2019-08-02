@@ -12,6 +12,7 @@ module Msg exposing
 import Browser exposing (UrlRequest(..))
 import Debounce
 import FrequencyDict exposing (FrequencyDict)
+import Keyboard
 import Lamdera.Types exposing (ClientId, WsError)
 import Note exposing (Note)
 import Time exposing (Posix)
@@ -55,6 +56,7 @@ type FrontendMsg
     | DebounceBody Debounce.Msg
     | DebounceSubject Debounce.Msg
     | DebounceTags Debounce.Msg
+    | KeyboardMsg Keyboard.Msg
       -- Admin
     | SendUsers
       -- App

@@ -23,7 +23,7 @@ import FrequencyDict exposing (FrequencyDict)
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Html.Attributes as HA
-import Keyboard
+import Keyboard exposing (Key(..))
 import Lamdera.Frontend as Frontend
 import Lamdera.Types exposing (..)
 import Markdown
@@ -68,6 +68,7 @@ app =
 type alias Model =
     { input : String
     , appMode : AppMode
+    , pressedKeys : List Key
     , manualVisible : Bool
     , message : String
     , counter : Int
@@ -122,6 +123,7 @@ config =
 initialModel =
     { input = "App started"
     , message = "Please sign in"
+    , pressedKeys = []
     , appMode = UserValidation SignInState
     , manualVisible = False
     , currentTime = Time.millisToPosix 0
@@ -168,7 +170,10 @@ sendToBackend =
 
 
 subscriptions model =
-    Time.every 1000 TimeChange
+    Sub.batch
+        [ Time.every 1000 TimeChange
+        , Sub.map KeyboardMsg Keyboard.subscriptions
+        ]
 
 
 
@@ -245,6 +250,30 @@ update msg model =
     case msg of
         FENoop ->
             ( model, Cmd.none )
+
+        Msg.KeyboardMsg keyMsg ->
+            let
+                pressedKeys =
+                    Debug.log "XX, pressedKeys" <|
+                        Keyboard.update keyMsg model.pressedKeys
+
+                newModel =
+                    case List.member Control pressedKeys of
+                        False ->
+                            model
+
+                        True ->
+                            model
+                                |> toggleManualUsingKey pressedKeys
+                                |> setBrowsingModeUsingKey pressedKeys
+                                |> editNoteUsingKey pressedKeys
+                                |> makeNewNoteUsingKey pressedKeys
+            in
+            ( { newModel
+                | pressedKeys = pressedKeys
+              }
+            , Cmd.none
+            )
 
         SetManualVislble bit ->
             ( { model | manualVisible = bit }, Cmd.none )
@@ -350,23 +379,21 @@ update msg model =
                         _ ->
                             Cmd.none
 
-                message =
+                newModel =
                     case mode of
                         UserValidation SignInState ->
-                            "Please sign in"
+                            { model | message = "Please sign in", appMode = mode }
 
                         UserValidation SignUpState ->
-                            "Please sign up"
+                            { model | message = "Please sign up", appMode = mode }
+
+                        UserNotes BrowsingNotes ->
+                            { model | appMode = mode, maybeCurrentNote = Note.firstSelectedNote model.notes }
 
                         _ ->
-                            ""
+                            { model | appMode = mode }
             in
-            ( { model
-                | appMode = mode
-                , message = message
-              }
-            , cmd
-            )
+            ( newModel, cmd )
 
         SetDeleteNoteSafety deleteNoteSafetyState ->
             ( { model | deleteNoteSafety = deleteNoteSafetyState }, Cmd.none )
@@ -1336,6 +1363,91 @@ submitNoteButton =
 
 -- VIEW HELPERS
 --
+
+
+makeNewNote : Model -> Model
+makeNewNote model =
+    let
+        n =
+            Note.make -1 "New Note" "XXX" model.currentTime
+    in
+    { model
+        | appMode = UserNotes CreatingNote
+        , maybeCurrentNote = Just n
+        , noteBody = n.body
+        , newSubject = n.subject
+        , tagString = ""
+        , counter = model.counter + 1
+    }
+
+
+editNote : Model -> Model
+editNote model =
+    case model.maybeCurrentNote of
+        Nothing ->
+            model
+
+        Just note ->
+            { model
+                | appMode = UserNotes EditingNote
+                , noteBody = note.body
+                , changedSubject = note.subject
+                , tagString = String.join ", " note.tags
+            }
+
+
+setBrowsingModeUsingKey : List Key -> Model -> Model
+setBrowsingModeUsingKey pressedKeys model =
+    if List.member (Character "B") pressedKeys then
+        { model | appMode = UserNotes BrowsingNotes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+
+    else
+        model
+
+
+toggleManualUsingKey : List Key -> Model -> Model
+toggleManualUsingKey pressedKeys model =
+    if List.member (Character "M") pressedKeys then
+        { model | manualVisible = manualVisibleForKey pressedKeys model }
+
+    else
+        model
+
+
+editNoteUsingKey : List Key -> Model -> Model
+editNoteUsingKey pressedKeys model =
+    if List.member (Character "E") pressedKeys then
+        editNote model
+
+    else
+        model
+
+
+makeNewNoteUsingKey : List Key -> Model -> Model
+makeNewNoteUsingKey pressedKeys model =
+    if List.member (Character "N") pressedKeys then
+        makeNewNote model
+
+    else
+        model
+
+
+appModeOfKey : AppMode -> List Key -> AppMode
+appModeOfKey currentAppMode pressedKeys =
+    if List.member (Character "B") pressedKeys then
+        UserNotes BrowsingNotes
+
+    else
+        currentAppMode
+
+
+manualVisibleForKey : List Key -> Model -> Bool
+manualVisibleForKey pressedKeys model =
+    if List.member (Character "M") pressedKeys then
+        not model.manualVisible
+
+    else
+        model.manualVisible
 
 
 showIf : Bool -> Element FrontendMsg -> Element FrontendMsg
