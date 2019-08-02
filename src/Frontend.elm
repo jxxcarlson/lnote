@@ -254,8 +254,7 @@ update msg model =
         Msg.KeyboardMsg keyMsg ->
             let
                 pressedKeys =
-                    Debug.log "XX, pressedKeys" <|
-                        Keyboard.update keyMsg model.pressedKeys
+                    Keyboard.update keyMsg model.pressedKeys
 
                 newModel =
                     case List.member Control pressedKeys of
@@ -279,7 +278,6 @@ update msg model =
             ( { model | manualVisible = bit }, Cmd.none )
 
         DebounceBody msg_ ->
-            -- YYY
             let
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
@@ -859,7 +857,7 @@ noUserLHS model =
                 , showIf (model.appMode == UserValidation SignUpState) (cancelSignUpButton model)
                 ]
             ]
-        , el [ Font.size 12 ] (text model.message)
+        , el [ Font.size 14, Font.color Style.darkRed ] (text model.message)
         ]
 
 
@@ -903,7 +901,7 @@ passwordPanel model =
         [ inputCurrentPassword model
         , inputNewPassword1 model
         , inputNewPassword2 model
-        , el [ Font.size 12 ] (text model.message)
+        , el [ Font.size 16, Font.color Style.darkRed ] (text model.message)
         ]
 
 
@@ -1272,6 +1270,29 @@ inputChangedSubject model =
 --
 
 
+noteListPanel : Model -> Element FrontendMsg
+noteListPanel model =
+    column [ spacing 20, height (px config.panelHeight), width (px (config.panelWidth - 50)), Border.width 1 ]
+        [ viewNotes model
+        ]
+
+
+noteNameButton : Maybe Note -> Note -> Element FrontendMsg
+noteNameButton maybeCurrentNote note =
+    Input.button (Style.titleButton (maybeCurrentNote == Just note))
+        { onPress = Just FENoop
+        , label = Element.text note.subject
+        }
+
+
+setCurrentNoteButton : Model -> Note -> Int -> Element FrontendMsg
+setCurrentNoteButton model note index =
+    Input.button (Style.titleButton (Just note == model.maybeCurrentNote))
+        { onPress = Just FENoop
+        , label = el [ Font.bold ] (Element.text <| String.fromInt note.id)
+        }
+
+
 viewNotes : Model -> Element FrontendMsg
 viewNotes model =
     column [ spacing 12, padding 20, height (px 510) ]
@@ -1296,6 +1317,46 @@ viewNotes model =
             , tagButtons model
             ]
         ]
+
+
+viewNote : Maybe Note -> Element FrontendMsg
+viewNote maybeNote =
+    case maybeNote of
+        Nothing ->
+            column [ padding 20, spacing 20, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
+                [ el [ Font.size 12 ] (text "No note selected")
+                ]
+
+        Just note ->
+            let
+                created =
+                    "*Created: " ++ DateTime.humanDateStringFromPosix note.timeCreated ++ "*, "
+
+                modified =
+                    "*modified: " ++ DateTime.humanDateStringFromPosix note.timeModified ++ "*\n\n"
+
+                title =
+                    "# " ++ note.subject ++ "\n\n"
+
+                tags =
+                    case note.tags of
+                        [] ->
+                            "Tags: none\n\n"
+
+                        _ ->
+                            "**Tags:** " ++ String.join ", " note.tags ++ "\n\n"
+
+                hr =
+                    """<hr style="height:1px; border:none; background-color: #333;" />
+
+"""
+
+                content =
+                    title ++ created ++ modified ++ tags ++ hr ++ note.body
+            in
+            column [ padding 20, spacing 12, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
+                [ toMarkdown content |> Element.html
+                ]
 
 
 tagButtons : Model -> Element FrontendMsg
@@ -1361,8 +1422,16 @@ submitNoteButton =
 
 
 
--- VIEW HELPERS
 --
+-- UPDATE HELPERS
+--
+
+
+type alias UpdateNoteRecord =
+    { maybeCurrentNote : Note
+    , notes : List Note
+    , cmd : Cmd FrontendMsg
+    }
 
 
 makeNewNote : Model -> Model
@@ -1394,6 +1463,41 @@ editNote model =
                 , changedSubject = note.subject
                 , tagString = String.join ", " note.tags
             }
+
+
+newNote : Model -> Maybe Note
+newNote model =
+    case ( model.currentUser, String.length model.newSubject > 0 ) of
+        ( Just user, True ) ->
+            let
+                now =
+                    model.currentTime
+            in
+            Just <|
+                { id = -1
+                , subject = model.newSubject
+                , body = model.noteBody
+                , tags = Note.tagsFromString model.tagString
+                , timeCreated = now
+                , timeModified = now
+                , selected = True
+                }
+
+        _ ->
+            Nothing
+
+
+selectNotes model =
+    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
+        |> Note.applySubjectFilter model.noteFilterString
+        |> Note.applyBodyFilter model.textFilterString
+        |> Note.applyTagFilter model.tagFilterString
+
+
+
+--
+-- KEY COMMANDS
+--
 
 
 setBrowsingModeUsingKey : List Key -> Model -> Model
@@ -1450,6 +1554,12 @@ manualVisibleForKey pressedKeys model =
         model.manualVisible
 
 
+
+--
+-- ELEMENT VISIBILITY HANDLERS
+--
+
+
 showIf : Bool -> Element FrontendMsg -> Element FrontendMsg
 showIf bit element =
     if bit then
@@ -1476,35 +1586,6 @@ showOne bit str1 str2 =
 
         False ->
             str2
-
-
-newNote : Model -> Maybe Note
-newNote model =
-    case ( model.currentUser, String.length model.newSubject > 0 ) of
-        ( Just user, True ) ->
-            let
-                now =
-                    model.currentTime
-            in
-            Just <|
-                { id = -1
-                , subject = model.newSubject
-                , body = model.noteBody
-                , tags = Note.tagsFromString model.tagString
-                , timeCreated = now
-                , timeModified = now
-                , selected = True
-                }
-
-        _ ->
-            Nothing
-
-
-selectNotes model =
-    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
-        |> Note.applySubjectFilter model.noteFilterString
-        |> Note.applyBodyFilter model.textFilterString
-        |> Note.applyTagFilter model.tagFilterString
 
 
 
@@ -1553,44 +1634,10 @@ adminView_ model user =
         ]
 
 
-viewNote : Maybe Note -> Element FrontendMsg
-viewNote maybeNote =
-    case maybeNote of
-        Nothing ->
-            column [ padding 20, spacing 20, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
-                [ el [ Font.size 12 ] (text "No note selected")
-                ]
 
-        Just note ->
-            let
-                created =
-                    "*Created: " ++ DateTime.humanDateStringFromPosix note.timeCreated ++ "*, "
-
-                modified =
-                    "*modified: " ++ DateTime.humanDateStringFromPosix note.timeModified ++ "*\n\n"
-
-                title =
-                    "# " ++ note.subject ++ "\n\n"
-
-                tags =
-                    case note.tags of
-                        [] ->
-                            "Tags: none\n\n"
-
-                        _ ->
-                            "**Tags:** " ++ String.join ", " note.tags ++ "\n\n"
-
-                hr =
-                    """<hr style="height:1px; border:none; background-color: #333;" />
-
-"""
-
-                content =
-                    title ++ created ++ modified ++ tags ++ hr ++ note.body
-            in
-            column [ padding 20, spacing 12, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
-                [ toMarkdown content |> Element.html
-                ]
+--
+-- FILTERS
+--
 
 
 filterPanel model =
@@ -1685,40 +1732,10 @@ inputNoteCameAfterFilter model =
         }
 
 
-noteListPanel : Model -> Element FrontendMsg
-noteListPanel model =
-    column [ spacing 20, height (px config.panelHeight), width (px (config.panelWidth - 50)), Border.width 1 ]
-        [ viewNotes model
-        ]
-
-
-noteNameButton : Maybe Note -> Note -> Element FrontendMsg
-noteNameButton maybeCurrentNote note =
-    Input.button (Style.titleButton (maybeCurrentNote == Just note))
-        { onPress = Just FENoop
-        , label = Element.text note.subject
-        }
-
-
-setCurrentNoteButton : Model -> Note -> Int -> Element FrontendMsg
-setCurrentNoteButton model note index =
-    Input.button (Style.titleButton (Just note == model.maybeCurrentNote))
-        { onPress = Just FENoop
-        , label = el [ Font.bold ] (Element.text <| String.fromInt note.id)
-        }
-
-
 
 --
--- UPDATE HELPERS
+-- DOWNLOAD
 --
-
-
-type alias UpdateNoteRecord =
-    { maybeCurrentNote : Note
-    , notes : List Note
-    , cmd : Cmd FrontendMsg
-    }
 
 
 downloadNotes : List Note -> Cmd FrontendMsg
