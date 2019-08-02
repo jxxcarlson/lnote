@@ -11,7 +11,7 @@ the current selection to a text file
 selection in yaml form.  Thus the notes
 you create are not hostage to the system.
 
-- There are key commands.  For now, as follows
+- Key commands:
   - ^B: Switch to browse mode
   - ^E: Edit the current note
   - ^M: Display (or hide) the manual
