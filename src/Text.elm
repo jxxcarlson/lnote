@@ -16,4 +16,6 @@ you create are not hostage to the system.
   - ^E: Edit the current note
   - ^M: Display (or hide) the manual
   - ^N: New note
+  - ^U: Sort by decreasing modification time
+  - ^V: Sort by increasing modification time
 """
