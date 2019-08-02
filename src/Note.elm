@@ -318,13 +318,7 @@ sortByTimeModified sortDirection noteList =
             List.sortBy (\note -> note.timeCreated |> Time.posixToMillis) noteList
 
         SortDecreasing ->
-            -- let
-            --     negativePosixtoMillis : Posix -> Int
-            --     negativePosixtoMillis p =
-            --       -- Time.posixToMillis
-            --       --   -1 * Time.posixToMillis p
-            -- in
-            List.sortBy (\note -> note.timeCreated |> Time.posixToMillis) noteList
+            List.sortBy (\note -> note.timeCreated |> Time.posixToMillis |> (\x -> -x)) noteList
 
         Unsorted ->
             noteList

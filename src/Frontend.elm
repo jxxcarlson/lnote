@@ -267,7 +267,8 @@ update msg model =
                                 |> setBrowsingModeUsingKey pressedKeys
                                 |> editNoteUsingKey pressedKeys
                                 |> makeNewNoteUsingKey pressedKeys
-                                |> sortByDateUsingKey pressedKeys
+                                |> sortIncreasingByDateUsingKey pressedKeys
+                                |> sortDecreasingByDateUsingKey pressedKeys
             in
             ( { newModel
                 | pressedKeys = pressedKeys
@@ -1505,10 +1506,28 @@ selectNotes model =
 --
 
 
-sortByDateUsingKey : List Key -> Model -> Model
-sortByDateUsingKey pressedKeys model =
+sortDecreasingByDateUsingKey : List Key -> Model -> Model
+sortDecreasingByDateUsingKey pressedKeys model =
     if List.member (Character "U") pressedKeys then
+        { model | notes = Note.sortByTimeModified Note.SortDecreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+
+    else
+        model
+
+
+sortIncreasingByDateUsingKey : List Key -> Model -> Model
+sortIncreasingByDateUsingKey pressedKeys model =
+    if List.member (Character "V") pressedKeys then
         { model | notes = Note.sortByTimeModified Note.SortIncreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+
+    else
+        model
+
+
+unsortedUsingKey : List Key -> Model -> Model
+unsortedUsingKey pressedKeys model =
+    if List.member (Character "W") pressedKeys then
+        { model | notes = model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
 
     else
         model
