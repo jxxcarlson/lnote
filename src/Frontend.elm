@@ -857,7 +857,7 @@ noUserLHS model =
                 , showIf (model.appMode == UserValidation SignUpState) (cancelSignUpButton model)
                 ]
             ]
-        , el [ Font.size 14, Font.color Style.darkRed ] (text model.message)
+        , el [ Font.size 16, Font.color Style.darkRed ] (text model.message)
         ]
 
 
@@ -1303,6 +1303,10 @@ viewNotes model =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
                   , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt note.id)
+                  }
+                , { header = el [ Font.bold ] (text <| "Modified")
+                  , width = px 90
+                  , view = \k note -> el [ Font.size 12 ] (text <| DateTime.humanDateStringFromPosix note.timeModified)
                   }
                 , { header = el [ Font.bold ] (text "Subject")
                   , width = px 220
