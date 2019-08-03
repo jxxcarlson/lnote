@@ -270,7 +270,8 @@ update msg model =
                                 |> sortIncreasingByDateUsingKey pressedKeys
                                 |> sortDecreasingByDateUsingKey pressedKeys
                                 |> sortIncreasingAlphabeticallyUsingKey pressedKeys
-                                |> sortDecreasingAlphabeticallyUsingKey pressedKeys
+
+                -- |> sortDecreasingAlphabeticallyUsingKey pressedKeys
             in
             ( { newModel
                 | pressedKeys = pressedKeys
