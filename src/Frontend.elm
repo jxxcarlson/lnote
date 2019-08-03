@@ -269,6 +269,8 @@ update msg model =
                                 |> makeNewNoteUsingKey pressedKeys
                                 |> sortIncreasingByDateUsingKey pressedKeys
                                 |> sortDecreasingByDateUsingKey pressedKeys
+                                |> sortIncreasingAlphabeticallyUsingKey pressedKeys
+                                |> sortDecreasingAlphabeticallyUsingKey pressedKeys
             in
             ( { newModel
                 | pressedKeys = pressedKeys
@@ -1504,6 +1506,24 @@ selectNotes model =
 --
 -- KEY COMMANDS
 --
+
+
+sortIncreasingAlphabeticallyUsingKey : List Key -> Model -> Model
+sortIncreasingAlphabeticallyUsingKey pressedKeys model =
+    if List.member (Character "A") pressedKeys then
+        { model | notes = Note.sortAlphabetically Note.SortIncreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+
+    else
+        model
+
+
+sortDecreasingAlphabeticallyUsingKey : List Key -> Model -> Model
+sortDecreasingAlphabeticallyUsingKey pressedKeys model =
+    if List.member (Character "B") pressedKeys then
+        { model | notes = Note.sortAlphabetically Note.SortDecreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+
+    else
+        model
 
 
 sortDecreasingByDateUsingKey : List Key -> Model -> Model

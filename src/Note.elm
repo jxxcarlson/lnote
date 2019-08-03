@@ -17,6 +17,7 @@ module Note exposing
     , replace
     , select
     , selectAll
+    , sortAlphabetically
     , sortByTimeModified
     , tagsFromString
     , toYaml
@@ -113,6 +114,12 @@ replace note noteList =
 remove : Note -> List Note -> List Note
 remove note noteList =
     List.filter (\n -> n.id /= note.id) noteList
+
+
+
+--
+-- FILTERING
+--
 
 
 bigDateFilter : Posix -> String -> String -> List Note -> List Note
@@ -235,6 +242,12 @@ posixInterval p_ q_ =
     (p - q) / 1000.0
 
 
+
+--
+-- TAGS
+--
+
+
 tagsFromString : String -> List String
 tagsFromString str =
     str
@@ -245,6 +258,12 @@ tagsFromString str =
 frequencies : List Note -> FrequencyDict
 frequencies noteList =
     FrequencyDict.make (List.map .tags noteList |> List.concat)
+
+
+
+--
+-- SELECTING
+--
 
 
 selectAll : List Note -> List Note
@@ -305,6 +324,12 @@ firstSelectedNote noteList =
     List.filter (\note -> note.selected) noteList |> List.head
 
 
+
+--
+-- SORTING
+--
+
+
 type SortDirection
     = SortIncreasing
     | SortDecreasing
@@ -319,6 +344,18 @@ sortByTimeModified sortDirection noteList =
 
         SortDecreasing ->
             List.sortBy (\note -> note.timeCreated |> Time.posixToMillis |> (\x -> -x)) noteList
+
+        Unsorted ->
+            noteList
+
+
+sortAlphabetically sortDirection noteList =
+    case sortDirection of
+        SortIncreasing ->
+            List.sortBy (\note -> note.subject) noteList
+
+        SortDecreasing ->
+            List.sortBy (\note -> note.subject) noteList |> List.reverse
 
         Unsorted ->
             noteList
