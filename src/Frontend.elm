@@ -1511,7 +1511,7 @@ selectNotes model =
 sortIncreasingAlphabeticallyUsingKey : List Key -> Model -> Model
 sortIncreasingAlphabeticallyUsingKey pressedKeys model =
     if List.member (Character "A") pressedKeys then
-        { model | notes = Note.sortAlphabetically Note.SortIncreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+        { model | notes = Note.sortAlphabetically Note.SortIncreasing model.notes }
 
     else
         model
@@ -1520,7 +1520,7 @@ sortIncreasingAlphabeticallyUsingKey pressedKeys model =
 sortDecreasingAlphabeticallyUsingKey : List Key -> Model -> Model
 sortDecreasingAlphabeticallyUsingKey pressedKeys model =
     if List.member (Character "B") pressedKeys then
-        { model | notes = Note.sortAlphabetically Note.SortDecreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+        { model | notes = Note.sortAlphabetically Note.SortDecreasing model.notes }
 
     else
         model
@@ -1529,7 +1529,7 @@ sortDecreasingAlphabeticallyUsingKey pressedKeys model =
 sortDecreasingByDateUsingKey : List Key -> Model -> Model
 sortDecreasingByDateUsingKey pressedKeys model =
     if List.member (Character "U") pressedKeys then
-        { model | notes = Note.sortByTimeModified Note.SortDecreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+        { model | notes = Note.sortByTimeModified Note.SortDecreasing model.notes }
 
     else
         model
@@ -1538,7 +1538,7 @@ sortDecreasingByDateUsingKey pressedKeys model =
 sortIncreasingByDateUsingKey : List Key -> Model -> Model
 sortIncreasingByDateUsingKey pressedKeys model =
     if List.member (Character "V") pressedKeys then
-        { model | notes = Note.sortByTimeModified Note.SortIncreasing model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+        { model | notes = Note.sortByTimeModified Note.SortIncreasing model.notes }
 
     else
         model
@@ -1547,7 +1547,7 @@ sortIncreasingByDateUsingKey pressedKeys model =
 unsortedUsingKey : List Key -> Model -> Model
 unsortedUsingKey pressedKeys model =
     if List.member (Character "W") pressedKeys then
-        { model | notes = model.notes, maybeCurrentNote = Note.firstSelectedNote model.notes }
+        { model | notes = model.notes }
 
     else
         model
