@@ -18,7 +18,8 @@ you create are not hostage to the system.
   - ^B: Switch to browse mode
   - ^E: Edit the current note
   - ^M: Display (or hide) the manual
-  - ^N: New note
+  - ^N: New note (set it up)
+  - ^K: Create the new new note
   - ^A: Sort alphabetically
   - ^U: Sort by decreasing modification time
   - ^V: Sort by increasing modification time

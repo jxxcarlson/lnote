@@ -270,11 +270,24 @@ update msg model =
                                 |> sortIncreasingByDateUsingKey pressedKeys
                                 |> sortDecreasingByDateUsingKey pressedKeys
                                 |> sortIncreasingAlphabeticallyUsingKey pressedKeys
+
+                ( newModel2, cmd ) =
+                    case List.member Control pressedKeys of
+                        False ->
+                            ( newModel, Cmd.none )
+
+                        True ->
+                            case List.member (Character "K") pressedKeys of
+                                False ->
+                                    ( newModel, Cmd.none )
+
+                                True ->
+                                    createNote newModel
             in
-            ( { newModel
+            ( { newModel2
                 | pressedKeys = pressedKeys
               }
-            , Cmd.none
+            , cmd
             )
 
         SetManualVislble bit ->
