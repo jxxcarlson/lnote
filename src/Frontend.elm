@@ -270,8 +270,6 @@ update msg model =
                                 |> sortIncreasingByDateUsingKey pressedKeys
                                 |> sortDecreasingByDateUsingKey pressedKeys
                                 |> sortIncreasingAlphabeticallyUsingKey pressedKeys
-
-                -- |> sortDecreasingAlphabeticallyUsingKey pressedKeys
             in
             ( { newModel
                 | pressedKeys = pressedKeys
@@ -627,20 +625,7 @@ update msg model =
             )
 
         FECreateNote ->
-            case newNote model of
-                Nothing ->
-                    ( model, Cmd.none )
-
-                Just n ->
-                    ( { model
-                        | maybeCurrentNote = Just n
-                        , changedSubject = n.subject
-                        , noteBody = n.body
-                        , appMode = UserNotes EditingNote
-                        , counter = model.counter + 1
-                      }
-                    , sendToBackend config.timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
-                    )
+            createNote model
 
         FEEditNote ->
             case model.maybeCurrentNote of
@@ -1441,6 +1426,24 @@ type alias UpdateNoteRecord =
     , notes : List Note
     , cmd : Cmd FrontendMsg
     }
+
+
+createNote : Model -> ( Model, Cmd FrontendMsg )
+createNote model =
+    case newNote model of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just n ->
+            ( { model
+                | maybeCurrentNote = Just n
+                , changedSubject = n.subject
+                , noteBody = n.body
+                , appMode = UserNotes EditingNote
+                , counter = model.counter + 1
+              }
+            , sendToBackend config.timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
+            )
 
 
 makeNewNote : Model -> Model
