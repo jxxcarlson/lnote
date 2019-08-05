@@ -5,7 +5,8 @@ module Note exposing
     , applySubjectFilter
     , applyTagFilter
     , bigDateFilter
-    , filter
+    , conjunctiveSearch
+    , filterBySubject
     , filterByTag
     , filterText
     , firstSelectedNote
@@ -19,6 +20,7 @@ module Note exposing
     , selectAll
     , sortAlphabetically
     , sortByTimeModified
+    , stringContainsWords
     , tagsFromString
     , toYaml
     )
@@ -149,8 +151,8 @@ prefixFilter today prefixParameterString noteList =
             datePrefixFilter today k noteList
 
 
-filter : String -> List Note -> List Note
-filter filterString notes =
+filterBySubject : String -> List Note -> List Note
+filterBySubject filterString notes =
     List.filter (\note -> String.contains (String.toLower filterString) (String.toLower note.subject)) notes
 
 
@@ -277,12 +279,30 @@ select note =
     { note | selected = True }
 
 
+stringContainsWords : List String -> String -> Bool
+stringContainsWords wordList str =
+    let
+        wordList_ =
+            List.map String.toLower wordList
+
+        str_ =
+            String.toLower str
+    in
+    List.foldl (\w acc -> String.contains w str_ && acc) True wordList_
+
+
+conjunctiveSearch : String -> String -> Bool
+conjunctiveSearch key target =
+    stringContainsWords (String.words key) target
+
+
 applySubjectFilter : String -> List Note -> List Note
 applySubjectFilter str noteList =
     let
         f : Note -> Bool
         f note =
-            String.contains (String.toLower str) (String.toLower note.subject)
+            -- String.contains (String.toLower str) (String.toLower note.subject)
+            conjunctiveSearch str note.subject
 
         select_ : Note -> Note
         select_ note =
