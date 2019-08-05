@@ -301,7 +301,6 @@ applySubjectFilter str noteList =
     let
         f : Note -> Bool
         f note =
-            -- String.contains (String.toLower str) (String.toLower note.subject)
             conjunctiveSearch str note.subject
 
         select_ : Note -> Note
@@ -316,7 +315,7 @@ applyBodyFilter str noteList =
     let
         f : Note -> Bool
         f note =
-            String.contains (String.toLower str) (String.toLower note.body)
+            conjunctiveSearch str note.body
 
         select_ : Note -> Note
         select_ note =
