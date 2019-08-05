@@ -27,5 +27,5 @@ you create are not hostage to the system.
 box to search for all notes containing "intro" and "po"
 in the subject, e.g., "Introduction to Poetry" and
 "Intro to Political Science." Searching the body of the note
-(full text search) works the same way.
+(full text search) works the same way.  Likewise for tags.
 """

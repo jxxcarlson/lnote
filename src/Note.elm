@@ -11,6 +11,8 @@ module Note exposing
     , filterText
     , firstSelectedNote
     , frequencies
+    , fuzzyListMember
+    , fuzzyMatchWordList
     , kDaysAgo
     , listToYaml
     , make
@@ -302,6 +304,16 @@ matchWordList keyList targetList =
     List.foldl (\k acc -> List.member k targetList && acc) True keyList
 
 
+fuzzyMatchWordList : List String -> List String -> Bool
+fuzzyMatchWordList keyList targetList =
+    List.foldl (\k acc -> fuzzyListMember k targetList && acc) True keyList
+
+
+fuzzyListMember : String -> List String -> Bool
+fuzzyListMember str strList =
+    List.foldl (\w acc -> String.contains str w || acc) False strList
+
+
 applySubjectFilter : String -> List Note -> List Note
 applySubjectFilter str noteList =
     let
@@ -339,7 +351,7 @@ applyTagFilter str noteList =
         f : Note -> Bool
         f note =
             --List.member (String.toLower str) note.tags
-            matchWordList keys note.tags
+            fuzzyMatchWordList keys note.tags
 
         select_ : Note -> Note
         select_ note =
