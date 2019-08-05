@@ -14,6 +14,7 @@ module Note exposing
     , kDaysAgo
     , listToYaml
     , make
+    , matchWordList
     , remove
     , replace
     , select
@@ -296,6 +297,11 @@ conjunctiveSearch key target =
     stringContainsWords (String.words key) target
 
 
+matchWordList : List String -> List String -> Bool
+matchWordList keyList targetList =
+    List.foldl (\k acc -> List.member k targetList && acc) True keyList
+
+
 applySubjectFilter : String -> List Note -> List Note
 applySubjectFilter str noteList =
     let
@@ -327,9 +333,13 @@ applyBodyFilter str noteList =
 applyTagFilter : String -> List Note -> List Note
 applyTagFilter str noteList =
     let
+        keys =
+            str |> String.toLower |> String.words
+
         f : Note -> Bool
         f note =
-            List.member (String.toLower str) note.tags
+            --List.member (String.toLower str) note.tags
+            matchWordList keys note.tags
 
         select_ : Note -> Note
         select_ note =

@@ -26,5 +26,6 @@ you create are not hostage to the system.
 - **Search.**  Put "intro po" in the "Search by subject"
 box to search for all notes containing "intro" and "po"
 in the subject, e.g., "Introduction to Poetry" and
-"Intro to Political Science."
+"Intro to Political Science." Searching the body of the note
+(full text search) works the same way.
 """
