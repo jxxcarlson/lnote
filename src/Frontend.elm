@@ -636,7 +636,11 @@ update msg model =
             ( model, Random.generate SelectRandomNotes (Utility.randomIntegers 10 (List.length model.notes)) )
 
         SelectRandomNotes randomInts ->
-            ( { model | notes = Note.selectSublist randomInts model.notes }, Cmd.none )
+            let
+                newNotes =
+                    Note.selectSublist randomInts model.notes
+            in
+            ( { model | notes = newNotes, maybeCurrentNote = List.head newNotes }, Cmd.none )
 
         MakeNewNote ->
             let
