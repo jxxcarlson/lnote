@@ -818,6 +818,7 @@ activeFooter model =
         , hideIf (model.currentUser == Nothing) (editNoteButton model)
         , makeNewNoteButton model
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
+        , randomNotesButton
         , hideIf (model.currentUser == Nothing) downloadButton
         , toggleManualButton model
         ]
@@ -972,6 +973,14 @@ changePasswordButton model =
                 _ ->
                     Just <| SetAppMode (UserValidation ChangePasswordState)
         , label = Element.text "Change password"
+        }
+
+
+randomNotesButton =
+    Input.button
+        Style.headerButton
+        { onPress = Just GetRandomNotes
+        , label = Element.text "Random"
         }
 
 
