@@ -17,13 +17,14 @@ you create are not hostage to the system.
 - **Key commands.** Not all key commands correspond to a button.
   - ^A: Sort alphabetically
   - ^B: Switch to browse mode
+  - ^D: Sort by decreasing modification time
   - ^E: Edit the current note
+  - ^I: Sort by increasing modification time
   - ^M: Display (or hide) the manual
   - ^N: New note (set it up)
   - ^R: Random selection of notes
   - ^S: Save the new new note
-  - ^U: Sort by decreasing modification time
-  - ^V: Sort by increasing modification time
+  - ^U: Unselect: show all notes
 
 - **Search.**  Put "intro po" in the "Search by subject"
 box to search for all notes containing "intro" and "po"

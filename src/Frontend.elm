@@ -271,6 +271,7 @@ update msg model =
                                 |> sortIncreasingByDateUsingKey pressedKeys
                                 |> sortDecreasingByDateUsingKey pressedKeys
                                 |> sortIncreasingAlphabeticallyUsingKey pressedKeys
+                                |> unsortedUsingKey
 
                 cmd =
                     case List.member Control pressedKeys of
@@ -1574,7 +1575,7 @@ sortDecreasingAlphabeticallyUsingKey pressedKeys model =
 
 sortDecreasingByDateUsingKey : List Key -> Model -> Model
 sortDecreasingByDateUsingKey pressedKeys model =
-    if List.member (Character "U") pressedKeys then
+    if List.member (Character "D") pressedKeys then
         { model | notes = Note.sortByTimeModified Note.SortDecreasing model.notes }
 
     else
@@ -1583,7 +1584,7 @@ sortDecreasingByDateUsingKey pressedKeys model =
 
 sortIncreasingByDateUsingKey : List Key -> Model -> Model
 sortIncreasingByDateUsingKey pressedKeys model =
-    if List.member (Character "V") pressedKeys then
+    if List.member (Character "I") pressedKeys then
         { model | notes = Note.sortByTimeModified Note.SortIncreasing model.notes }
 
     else
@@ -1592,8 +1593,8 @@ sortIncreasingByDateUsingKey pressedKeys model =
 
 unsortedUsingKey : List Key -> Model -> Model
 unsortedUsingKey pressedKeys model =
-    if List.member (Character "W") pressedKeys then
-        { model | notes = model.notes }
+    if List.member (Character "U") pressedKeys then
+        { model | notes = Note.selectAll model.notes }
 
     else
         model
