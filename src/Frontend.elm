@@ -818,7 +818,6 @@ activeFooter model =
         , hideIf (model.currentUser == Nothing) (editNoteButton model)
         , makeNewNoteButton model
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
-        , randomNotesButton
         , hideIf (model.currentUser == Nothing) downloadButton
         , toggleManualButton model
         ]
