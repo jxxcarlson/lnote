@@ -271,7 +271,7 @@ update msg model =
                                 |> sortIncreasingByDateUsingKey pressedKeys
                                 |> sortDecreasingByDateUsingKey pressedKeys
                                 |> sortIncreasingAlphabeticallyUsingKey pressedKeys
-                                |> unsortedUsingKey
+                                |> unsortedUsingKey pressedKeys
 
                 cmd =
                     case List.member Control pressedKeys of
