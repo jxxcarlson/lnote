@@ -17,10 +17,12 @@ module Note exposing
     , listToYaml
     , make
     , matchWordList
+    , randomIntegers
     , remove
     , replace
     , select
     , selectAll
+    , selectSublist
     , sortAlphabetically
     , sortByTimeModified
     , stringContainsWords
@@ -30,6 +32,7 @@ module Note exposing
 
 import FrequencyDict exposing (FrequencyDict)
 import List.Extra
+import Random
 import Time exposing (Posix, toHour, toMinute, toSecond, utc)
 
 
@@ -266,9 +269,28 @@ frequencies noteList =
 
 
 
---
--- SELECTING
---
+-- SELECTING --
+
+
+{-| Generate a list of length k of integers in the range 0..n
+-}
+randomIntegers : Int -> Int -> Random.Generator (List Int)
+randomIntegers k n =
+    Random.list k (Random.int 0 n)
+
+
+selectSublist : List Int -> List Note -> List Note
+selectSublist intList noteList =
+    let
+        selectNote : Int -> Note -> Note
+        selectNote k note =
+            if List.member k intList then
+                { note | selected = True }
+
+            else
+                { note | selected = False }
+    in
+    List.indexedMap selectNote noteList
 
 
 selectAll : List Note -> List Note
