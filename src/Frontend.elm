@@ -640,7 +640,7 @@ update msg model =
                 newNotes =
                     Note.selectSublist randomInts model.notes
             in
-            ( { model | notes = newNotes, maybeCurrentNote = List.head newNotes }, Cmd.none )
+            ( { model | notes = newNotes, maybeCurrentNote = Note.firstSelectedNote newNotes }, Cmd.none )
 
         MakeNewNote ->
             let
