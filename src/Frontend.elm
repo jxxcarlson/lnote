@@ -29,6 +29,7 @@ import Lamdera.Types exposing (..)
 import Markdown
 import Msg exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendMsg(..), NotesMode(..), ToBackend(..), ToFrontend(..), ValidationState(..))
 import Note exposing (Note)
+import Random
 import Style
 import Task
 import TestData exposing (..)
@@ -271,20 +272,32 @@ update msg model =
                                 |> sortDecreasingByDateUsingKey pressedKeys
                                 |> sortIncreasingAlphabeticallyUsingKey pressedKeys
 
-                ( newModel2, cmd ) =
+                cmd =
                     case List.member Control pressedKeys of
                         False ->
-                            ( newModel, Cmd.none )
+                            Cmd.none
 
                         True ->
-                            case List.member (Character "K") pressedKeys of
-                                False ->
-                                    ( newModel, Cmd.none )
+                            if List.member (Character "R") pressedKeys then
+                                Random.generate SelectRandomNotes (Utility.randomIntegers 10 (List.length model.notes))
 
-                                True ->
-                                    createNote newModel
+                            else
+                                Cmd.none
+
+                -- ( newModel2, cmd ) =
+                --     case List.member Control pressedKeys of
+                --         False ->
+                --             ( newModel, Cmd.none )
+                --
+                --         True ->
+                --             case List.member (Character "K") pressedKeys of
+                --                 False ->
+                --                     ( newModel, Cmd.none )
+                --
+                --                 True ->
+                --                     createNote newModel
             in
-            ( { newModel2
+            ( { newModel
                 | pressedKeys = pressedKeys
               }
             , cmd
@@ -313,7 +326,6 @@ update msg model =
             ( model, cmd )
 
         DebounceSubject msg_ ->
-            -- YYY
             let
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
@@ -333,7 +345,6 @@ update msg model =
             ( model, cmd )
 
         DebounceTags msg_ ->
-            -- YYY
             let
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
@@ -355,7 +366,7 @@ update msg model =
         TimeChange t ->
             ( { model | currentTime = t }, Cmd.none )
 
-        -- ADMIN
+        -- ADMIN --
         SendUsers ->
             case currentUserIsAdmin model of
                 False ->
@@ -461,7 +472,7 @@ update msg model =
         SignOut ->
             ( initialModel, Cmd.none )
 
-        -- NOtE
+        -- NOTES --
         DownloadNotes ->
             ( model, downloadNotes (List.filter (\note -> note.selected) model.notes) )
 
@@ -620,6 +631,12 @@ update msg model =
               }
             , Cmd.none
             )
+
+        GetRandomNotes ->
+            ( model, Random.generate SelectRandomNotes (Utility.randomIntegers 10 (List.length model.notes)) )
+
+        SelectRandomNotes randomInts ->
+            ( { model | notes = Note.selectSublist randomInts model.notes }, Cmd.none )
 
         MakeNewNote ->
             let

@@ -17,7 +17,6 @@ module Note exposing
     , listToYaml
     , make
     , matchWordList
-    , randomIntegers
     , remove
     , replace
     , select
@@ -270,13 +269,6 @@ frequencies noteList =
 
 
 -- SELECTING --
-
-
-{-| Generate a list of length k of integers in the range 0..n
--}
-randomIntegers : Int -> Int -> Random.Generator (List Int)
-randomIntegers k n =
-    Random.list k (Random.int 0 n)
 
 
 selectSublist : List Int -> List Note -> List Note

@@ -96,6 +96,8 @@ type FrontendMsg
     | GotTagFilter String
     | SetTagForSearch String
     | ClearAllSearches
+    | GetRandomNotes
+    | SelectRandomNotes (List Int)
     | SetDeleteNoteSafety DeleteNoteSafety
 
 
