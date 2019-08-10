@@ -72,11 +72,7 @@ encrypt str =
 
 validatePassword : String -> String -> Bool
 validatePassword password encryptedPassword =
-    encrypt password == encryptedPassword
-
-
-
--- || encrypt1 password == encryptedPassword
+    encrypt password == encryptedPassword || encrypt1 password == encryptedPassword
 
 
 validateUser : PasswordDict -> Username -> String -> Bool
