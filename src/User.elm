@@ -60,19 +60,23 @@ getData username dict =
         |> Maybe.map .data
 
 
-encrypt1 : String -> String
-encrypt1 str =
+encrypt : String -> String
+encrypt str =
     "!@" ++ String.reverse str ++ "@!"
 
 
-encrypt : String -> String
-encrypt str =
+encrypt1 : String -> String
+encrypt1 str =
     Crypto.HMAC.digest sha512 "YoKO-mukti-yada-BlK#10&%F.7.910-hoH0" str
 
 
 validatePassword : String -> String -> Bool
 validatePassword password encryptedPassword =
-    encrypt password == encryptedPassword || encrypt1 password == encryptedPassword
+    encrypt password == encryptedPassword
+
+
+
+--|| encrypt1 password == encryptedPassword
 
 
 validateUser : PasswordDict -> Username -> String -> Bool
