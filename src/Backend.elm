@@ -98,7 +98,7 @@ updateFromFrontend clientId msg model =
                         newPasswordDict =
                             Dict.update username passwordUpdater model.passwordDict
                     in
-                    ( { model | passwordDict = newPasswordDict }, sendToFrontend clientId <| SendMessage <| "Password changed - " ++ User.encrypt newPassword )
+                    ( { model | passwordDict = newPasswordDict }, sendToFrontend clientId <| SendMessage <| "Password changed" )
 
                 False ->
                     ( model, sendToFrontend clientId <| SendMessage "Could not change password" )
