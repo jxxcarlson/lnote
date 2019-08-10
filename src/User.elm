@@ -15,6 +15,7 @@ module User exposing
     , validateUser
     )
 
+import Crypto.HMAC exposing (sha256, sha512)
 import Dict exposing (Dict)
 import FrequencyDict exposing (FrequencyDict)
 
@@ -59,14 +60,19 @@ getData username dict =
         |> Maybe.map .data
 
 
+encrypt1 : String -> String
+encrypt1 str =
+    "!@" ++ String.reverse str ++ "@!"
+
+
 encrypt : String -> String
 encrypt str =
-    "!@" ++ String.reverse str ++ "@!"
+    Crypto.HMAC.digest sha512 "YoKO-mukti-yada-BlK#10&%F.7.910-hoH0" str
 
 
 validatePassword : String -> String -> Bool
 validatePassword password encryptedPassword =
-    encrypt password == encryptedPassword
+    encrypt password == encryptedPassword || encrypt1 password == encryptedPassword
 
 
 validateUser : PasswordDict -> Username -> String -> Bool
