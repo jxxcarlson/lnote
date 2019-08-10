@@ -27,6 +27,7 @@ module Note exposing
     , stringContainsWords
     , tagsFromString
     , toYaml
+    , wordCount
     )
 
 import FrequencyDict exposing (FrequencyDict)
@@ -44,6 +45,11 @@ type alias Note =
     , timeModified : Posix
     , selected : Bool
     }
+
+
+wordCount : Note -> Int
+wordCount note =
+    note.body |> String.words |> List.length
 
 
 listToYaml : List Note -> String

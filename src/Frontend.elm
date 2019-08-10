@@ -1375,6 +1375,9 @@ viewNote maybeNote =
                 title =
                     "# " ++ note.subject ++ "\n\n"
 
+                words =
+                    "**Words:** " ++ String.fromInt (Note.wordCount note) ++ "\n\n"
+
                 tags =
                     case note.tags of
                         [] ->
@@ -1389,7 +1392,7 @@ viewNote maybeNote =
 """
 
                 content =
-                    title ++ created ++ modified ++ tags ++ hr ++ note.body
+                    title ++ created ++ modified ++ words ++ tags ++ hr ++ note.body
             in
             column [ padding 20, spacing 12, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
                 [ toMarkdown content |> Element.html
