@@ -5,7 +5,7 @@ manual =
     """
 # Manual
 
-- In case you were wondering: text that you are editing is automatically
+- **In case you were wondering:** text that you are editing is automatically
 saved twice per second (if the text has changed).
 
 - The **Download** button will download
