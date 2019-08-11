@@ -1376,7 +1376,7 @@ viewNote maybeNote =
                     "# " ++ note.subject ++ "\n\n"
 
                 words =
-                    "**Words:** " ++ String.fromInt (Note.wordCount note) ++ "\n\n"
+                    "**Words:** " ++ String.fromInt (Note.wordCount note) ++ " (" ++ String.fromInt (String.length note.body) ++ " characters)" ++ "\n\n"
 
                 tags =
                     case note.tags of
