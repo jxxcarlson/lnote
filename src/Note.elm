@@ -79,7 +79,7 @@ toYaml note =
         ++ "   - selected: "
         ++ stringFromBool note.selected
         ++ "\n"
-        ++ "   - body: |"
+        ++ "   - body: |\n"
         ++ bodyToYaml note.body
         ++ "\n====\n\n"
 
