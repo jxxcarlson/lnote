@@ -54,12 +54,14 @@ wordCount note =
 
 listToYaml : List Note -> String
 listToYaml noteList =
-    List.foldl (\note acc -> toYaml note ++ acc) "" noteList
+    "---\n"
+        ++ List.foldl (\note acc -> toYaml note ++ acc) "" noteList
 
 
 toYaml : Note -> String
 toYaml note =
-    "   - id: "
+    "- note\n"
+        "   - id: "
         ++ ("   " ++ String.fromInt note.id)
         ++ "\n"
         ++ "   - subject: "
