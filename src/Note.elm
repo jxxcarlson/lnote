@@ -59,27 +59,35 @@ listToYaml noteList =
 
 toYaml : Note -> String
 toYaml note =
-    "- id: "
-        ++ String.fromInt note.id
+    "   - id: "
+        ++ ("   " ++ String.fromInt note.id)
         ++ "\n"
-        ++ "- subject: "
-        ++ note.subject
+        ++ "   - subject: "
+        ++ ("   " ++ note.subject)
         ++ "\n"
-        ++ "- tags: ["
-        ++ String.join ", " note.tags
-        ++ "]\n"
-        ++ "- timeCreated: "
-        ++ toUtcString note.timeCreated
+        ++ "   - tags: ["
+        ++ String.join "   , " note.tags
+        ++ "   ]\n"
+        ++ "   - timeCreated: "
+        ++ ("   " ++ toUtcString note.timeCreated)
         ++ "\n"
-        ++ "- timeModified: "
-        ++ toUtcString note.timeModified
+        ++ "   - timeModified: "
+        ++ ("   " ++ toUtcString note.timeModified)
         ++ "\n"
-        ++ "- selected: "
-        ++ stringFromBool note.selected
+        ++ "   - selected: "
+        ++ ("   " ++ stringFromBool note.selected)
         ++ "\n"
-        ++ "- body: "
-        ++ note.body
+        ++ "   - body: |"
+        ++ bodyToYaml note.body
         ++ "\n====\n\n"
+
+
+bodyToYaml : String -> String
+bodyToYaml str =
+    str
+        |> String.lines
+        |> List.map (\s -> "   " ++ s)
+        |> String.join "\n"
 
 
 stringFromBool : Bool -> String
