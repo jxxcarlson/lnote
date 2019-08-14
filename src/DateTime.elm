@@ -1,6 +1,7 @@
 module DateTime exposing
     ( NaiveDateTime(..)
     , dateStringOfDateTimeString
+    , dateTimeStringFromPosix
     , humanDateStringFromPosix
     , isoStringFromNaiveDateTime
     , julianDayNumber
@@ -106,6 +107,30 @@ humanDateStringFromPosix posix =
             Time.toDay Time.utc posix |> String.fromInt |> String.padLeft 2 '0'
     in
     d ++ " " ++ m ++ " " ++ y
+
+
+dateTimeStringFromPosix : Posix -> String
+dateTimeStringFromPosix posix =
+    let
+        y =
+            Time.toYear Time.utc posix |> String.fromInt
+
+        m =
+            Time.toMonth Time.utc posix |> monthToString
+
+        d =
+            Time.toDay Time.utc posix |> String.fromInt |> String.padLeft 2 '0'
+
+        hours =
+            Time.toHour Time.utc posix |> String.fromInt |> String.padLeft 2 '0'
+
+        minutes =
+            Time.toMinute Time.utc posix |> String.fromInt |> String.padLeft 2 '0'
+
+        seconds =
+            Time.toSecond Time.utc posix |> String.fromInt |> String.padLeft 2 '0'
+    in
+    y ++ "-" ++ m ++ "-" ++ d ++ ":" ++ hours ++ ":" ++ minutes ++ ":" ++ seconds
 
 
 naiveTimeStringFromPosix : Posix -> String

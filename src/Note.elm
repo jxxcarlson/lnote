@@ -30,6 +30,7 @@ module Note exposing
     , wordCount
     )
 
+import DateTime
 import FrequencyDict exposing (FrequencyDict)
 import List.Extra
 import Random
@@ -52,6 +53,8 @@ wordCount note =
     note.body |> String.words |> List.length
 
 
+{-| Output validated at <https://codebeautify.org/yaml-validator>
+-}
 listToYaml : List Note -> String
 listToYaml noteList =
     "---\n"
@@ -71,10 +74,10 @@ toYaml note =
         ++ String.join ", " note.tags
         ++ "]\n"
         ++ "   - timeCreated: "
-        ++ toUtcString note.timeCreated
+        ++ DateTime.dateTimeStringFromPosix note.timeCreated
         ++ "\n"
         ++ "   - timeModified: "
-        ++ toUtcString note.timeModified
+        ++ DateTime.dateTimeStringFromPosix note.timeModified
         ++ "\n"
         ++ "   - selected: "
         ++ stringFromBool note.selected
