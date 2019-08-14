@@ -116,7 +116,7 @@ dateTimeStringFromPosix posix =
             Time.toYear Time.utc posix |> String.fromInt
 
         m =
-            Time.toMonth Time.utc posix |> monthToString
+            Time.toMonth Time.utc posix |> monthToStringAsNumber
 
         d =
             Time.toDay Time.utc posix |> String.fromInt |> String.padLeft 2 '0'
