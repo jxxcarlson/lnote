@@ -81,7 +81,7 @@ toYaml note =
         ++ "\n"
         ++ "   - body: |\n"
         ++ bodyToYaml note.body
-        ++ "\n====\n\n"
+        ++ "\n"
 
 
 bodyToYaml : String -> String
