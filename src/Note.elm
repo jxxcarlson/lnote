@@ -61,7 +61,7 @@ listToYaml noteList =
 toYaml : Note -> String
 toYaml note =
     "- note\n"
-        "   - id: "
+        ++ "   - id: "
         ++ ("   " ++ String.fromInt note.id)
         ++ "\n"
         ++ "   - subject: "
