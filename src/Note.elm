@@ -88,7 +88,7 @@ bodyToYaml : String -> String
 bodyToYaml str =
     str
         |> String.lines
-        |> List.map (\s -> "   " ++ s)
+        |> List.map (\s -> "      " ++ s)
         |> String.join "\n"
 
 
