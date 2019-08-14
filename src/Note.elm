@@ -65,19 +65,19 @@ toYaml note =
         ++ ("   " ++ String.fromInt note.id)
         ++ "\n"
         ++ "   - subject: "
-        ++ ("   " ++ note.subject)
+        ++ note.subject
         ++ "\n"
         ++ "   - tags: ["
-        ++ String.join "   , " note.tags
-        ++ "   ]\n"
+        ++ String.join ", " note.tags
+        ++ "]\n"
         ++ "   - timeCreated: "
-        ++ ("   " ++ toUtcString note.timeCreated)
+        ++ toUtcString note.timeCreated
         ++ "\n"
         ++ "   - timeModified: "
-        ++ ("   " ++ toUtcString note.timeModified)
+        ++ toUtcString note.timeModified
         ++ "\n"
         ++ "   - selected: "
-        ++ ("   " ++ stringFromBool note.selected)
+        ++ stringFromBool note.selected
         ++ "\n"
         ++ "   - body: |"
         ++ bodyToYaml note.body
