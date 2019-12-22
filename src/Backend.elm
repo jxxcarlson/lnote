@@ -1,4 +1,4 @@
-module Backend exposing (BackendModel, app, userList)
+module Backend exposing (app, userList)
 
 import Dict exposing (Dict)
 import FrequencyDict exposing (FrequencyDict)

@@ -43,6 +43,30 @@ type alias FrontendModel =
     , bodyDebouncer : Debounce String
     , subjectDebouncer : Debounce String
     , tagDebouncer : Debounce String
+
+    -- USER
+    , currentUser : Maybe User
+    , username : String
+    , password : String
+    , newPassword1 : String
+    , newPassword2 : String
+    , email : String
+    , userList : List User
+
+    -- NOTES
+    , notes : List Note
+    , maybeCurrentNote : Maybe Note
+    , frequencyDict : FrequencyDict
+    , newSubject : String
+    , changedSubject : String
+    , noteBody : String
+    , tagString : String
+    , noteFilterString : String
+    , textFilterString : String
+    , tagFilterString : String
+    , noteCameBeforeString : String
+    , noteCameAfterString : String
+    , deleteNoteSafety : DeleteNoteSafety
     }
 
 
