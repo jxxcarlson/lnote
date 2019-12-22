@@ -1,7 +1,9 @@
-module Msg exposing
+module Types exposing
     ( AppMode(..)
+    , BackendModel
     , BackendMsg(..)
     , DeleteNoteSafety(..)
+    , FrontendModel
     , FrontendMsg(..)
     , NotesMode(..)
     , ToBackend(..)
@@ -9,17 +11,39 @@ module Msg exposing
     , ValidationState(..)
     )
 
-import Browser exposing (UrlRequest(..))
-import Debounce
+import Browser exposing (UrlRequest)
+import Debounce exposing (Debounce)
 import FrequencyDict exposing (FrequencyDict)
-import Keyboard
-import Lamdera.Types exposing (ClientId, WsError)
+import Keyboard exposing (Key(..))
+import Lamdera.Frontend exposing (ClientId)
 import Note exposing (Note)
+import Set exposing (Set)
 import Time exposing (Posix)
 import TypedTime exposing (..)
 import Url exposing (Url)
-import User exposing (User)
+import User exposing (PasswordDict, User, UserDict)
 import UserData
+
+
+type alias BackendModel =
+    { passwordDict : PasswordDict
+    , userDict : UserDict Note
+    , clients : Set ClientId
+    }
+
+
+type alias FrontendModel =
+    { input : String
+    , appMode : AppMode
+    , pressedKeys : List Key
+    , manualVisible : Bool
+    , message : String
+    , counter : Int
+    , currentTime : Posix
+    , bodyDebouncer : Debounce String
+    , subjectDebouncer : Debounce String
+    , tagDebouncer : Debounce String
+    }
 
 
 type ToBackend
@@ -48,7 +72,10 @@ type ToFrontend
 
 type BackendMsg
     = NoOpBackendMsg
-    | SentToFrontendResult ClientId (Result WsError ())
+
+
+
+-- | SentToFrontendResult ClientId (Result WsError ())
 
 
 type FrontendMsg
@@ -61,7 +88,7 @@ type FrontendMsg
     | SendUsers
       -- App
     | SetAppMode AppMode
-    | SentToBackendResult (Result WsError ())
+      -- | SentToBackendResult (Result WsError ())
     | TimeChange Posix
     | SetManualVislble Bool
       -- User

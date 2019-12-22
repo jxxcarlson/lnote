@@ -1,15 +1,14 @@
-module Backend exposing (Model, app, userList)
+module Backend exposing (BackendModel, app, userList)
 
 import Dict exposing (Dict)
 import FrequencyDict exposing (FrequencyDict)
 import Frontend
-import Lamdera.Backend
-import Lamdera.Types exposing (..)
+import Lamdera.Backend exposing (ClientId, sendToFrontend)
 import Maybe.Extra
-import Msg exposing (..)
 import Note exposing (Note)
 import Set exposing (Set)
 import TestData exposing (passwordDict, userDict, userInfo1)
+import Types exposing (..)
 import User exposing (PasswordDict, User, UserDict, UserInfo, Username)
 import UserData
 
@@ -29,14 +28,7 @@ app =
 --
 
 
-type alias Model =
-    { passwordDict : PasswordDict
-    , userDict : UserDict Note
-    , clients : Set ClientId
-    }
-
-
-init : ( Model, Cmd BackendMsg )
+init : ( BackendModel, Cmd BackendMsg )
 init =
     ( { passwordDict = TestData.passwordDict
       , userDict = TestData.userDict
@@ -46,23 +38,25 @@ init =
     )
 
 
-update : BackendMsg -> Model -> ( Model, Cmd BackendMsg )
+update : BackendMsg -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 update msg model =
     case msg of
         NoOpBackendMsg ->
             ( model, Cmd.none )
 
-        -- Our sendToFrontend Cmd has completed
-        SentToFrontendResult clientId result ->
-            case result of
-                Ok () ->
-                    ( model, Cmd.none )
-
-                Err _ ->
-                    ( model, Cmd.none )
 
 
-updateFromFrontend : ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
+-- -- Our sendToFrontend Cmd has completed
+-- SentToFrontendResult clientId result ->
+--     case result of
+--         Ok () ->
+--             ( model, Cmd.none )
+--
+--         Err _ ->
+--             ( model, Cmd.none )
+
+
+updateFromFrontend : ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 updateFromFrontend clientId msg model =
     case msg of
         NoOpToBackend ->
@@ -200,7 +194,7 @@ updateFromFrontend clientId msg model =
 
 sendToFrontend : ClientId -> ToFrontend -> Cmd BackendMsg
 sendToFrontend clientId msg =
-    Lamdera.Backend.sendToFrontend 1000 clientId (\_ -> NoOpBackendMsg) msg
+    Lamdera.Backend.sendToFrontend clientId msg
 
 
 

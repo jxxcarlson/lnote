@@ -24,10 +24,8 @@ import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Html.Attributes as HA
 import Keyboard exposing (Key(..))
-import Lamdera.Frontend as Frontend
-import Lamdera.Types exposing (..)
+import Lamdera.Frontend exposing (sendToBackend)
 import Markdown
-import Msg exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendMsg(..), NotesMode(..), ToBackend(..), ToFrontend(..), ValidationState(..))
 import Note exposing (Note)
 import Random
 import Style
@@ -36,13 +34,14 @@ import TestData exposing (..)
 import Text
 import Time exposing (Posix)
 import TypedTime exposing (..)
+import Types exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendModel, FrontendMsg(..), NotesMode(..), ToBackend(..), ToFrontend(..), ValidationState(..))
 import Url exposing (Url)
 import User exposing (User, Username)
 import Utility
 
 
 app =
-    Frontend.application
+    Lamdera.Frontend.application
         { init = \_ _ -> init
         , onUrlRequest = ClickLink
         , onUrlChange = ChangeUrl
@@ -59,7 +58,7 @@ app =
 
 
 --
--- TYPES
+-- Types
 --
 --
 -- MODEL
@@ -67,41 +66,7 @@ app =
 
 
 type alias Model =
-    { input : String
-    , appMode : AppMode
-    , pressedKeys : List Key
-    , manualVisible : Bool
-    , message : String
-    , counter : Int
-    , currentTime : Posix
-    , bodyDebouncer : Debounce String
-    , subjectDebouncer : Debounce String
-    , tagDebouncer : Debounce String
-
-    -- USER
-    , currentUser : Maybe User
-    , username : String
-    , password : String
-    , newPassword1 : String
-    , newPassword2 : String
-    , email : String
-    , userList : List User
-
-    -- NOTES
-    , notes : List Note
-    , maybeCurrentNote : Maybe Note
-    , frequencyDict : FrequencyDict
-    , newSubject : String
-    , changedSubject : String
-    , noteBody : String
-    , tagString : String
-    , noteFilterString : String
-    , textFilterString : String
-    , tagFilterString : String
-    , noteCameBeforeString : String
-    , noteCameAfterString : String
-    , deleteNoteSafety : DeleteNoteSafety
-    }
+    FrontendModel
 
 
 
@@ -162,12 +127,7 @@ initialModel =
 
 init : ( Model, Cmd FrontendMsg )
 init =
-    ( initialModel, sendToBackend config.timeoutInMs SentToBackendResult ClientJoin )
-
-
-sendToBackend : Milliseconds -> (Result WsError () -> FrontendMsg) -> ToBackend -> Cmd FrontendMsg
-sendToBackend =
-    Frontend.sendToBackend
+    ( initialModel, sendToBackend ClientJoin )
 
 
 subscriptions model =
@@ -218,7 +178,7 @@ updateFromBackend msg model =
 
                 Just user ->
                     ( { model | currentUser = Just user, appMode = UserNotes BrowsingNotes }
-                    , sendToBackend config.timeoutInMs SentToBackendResult (RequestNotes (Just user))
+                    , sendToBackend (RequestNotes (Just user))
                     )
 
         SendFrequencyDict fD ->
@@ -252,7 +212,7 @@ update msg model =
         FENoop ->
             ( model, Cmd.none )
 
-        Msg.KeyboardMsg keyMsg ->
+        Types.KeyboardMsg keyMsg ->
             let
                 pressedKeys =
                     Keyboard.update keyMsg model.pressedKeys
@@ -312,7 +272,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | body = s, timeModified = model.currentTime })
+                            \s -> sendToBackend (UpdateNote model.currentUser { note | body = s, timeModified = model.currentTime })
 
                         _ ->
                             \s -> Cmd.none
@@ -331,7 +291,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser { note | subject = s, timeModified = model.currentTime })
+                            \s -> sendToBackend (UpdateNote model.currentUser { note | subject = s, timeModified = model.currentTime })
 
                         _ ->
                             \s -> Cmd.none
@@ -350,7 +310,7 @@ update msg model =
                 save =
                     case ( model.maybeCurrentNote, model.appMode ) of
                         ( Just note, UserNotes EditingNote ) ->
-                            \s -> sendToBackend config.timeoutInMs SentToBackendResult (UpdateTags model.currentUser { note | tags = Note.tagsFromString s, timeModified = model.currentTime })
+                            \s -> sendToBackend (UpdateTags model.currentUser { note | tags = Note.tagsFromString s, timeModified = model.currentTime })
 
                         _ ->
                             \s -> Cmd.none
@@ -375,13 +335,10 @@ update msg model =
 
                 True ->
                     ( model
-                    , sendToBackend config.timeoutInMs SentToBackendResult RequestUsers
+                    , sendToBackend RequestUsers
                     )
 
         -- BACKEND
-        SentToBackendResult result ->
-            ( model, Cmd.none )
-
         -- URL (NOT USED)
         ChangeUrl url ->
             ( model, Cmd.none )
@@ -400,7 +357,7 @@ update msg model =
                 cmd =
                     case mode of
                         Admin ->
-                            sendToBackend config.timeoutInMs SentToBackendResult RequestUsers
+                            sendToBackend RequestUsers
 
                         _ ->
                             Cmd.none
@@ -446,7 +403,7 @@ update msg model =
 
                         Just user ->
                             ( { model | message = "OK" }
-                            , sendToBackend config.timeoutInMs SentToBackendResult (SendChangePasswordInfo user.username model.password model.newPassword1)
+                            , sendToBackend (SendChangePasswordInfo user.username model.password model.newPassword1)
                             )
 
                 errorList ->
@@ -456,7 +413,7 @@ update msg model =
             ( { model | email = str }, Cmd.none )
 
         SignIn ->
-            ( initialModel, sendToBackend config.timeoutInMs SentToBackendResult (SendSignInInfo model.username model.password) )
+            ( initialModel, sendToBackend (SendSignInInfo model.username model.password) )
 
         SignUp ->
             let
@@ -468,7 +425,7 @@ update msg model =
                     ( { model | message = String.join ", " signUpErrors }, Cmd.none )
 
                 False ->
-                    ( initialModel, sendToBackend config.timeoutInMs SentToBackendResult (SendSignUpInfo model.username model.password model.email) )
+                    ( initialModel, sendToBackend (SendSignUpInfo model.username model.password model.email) )
 
         SignOut ->
             ( initialModel, Cmd.none )
@@ -701,7 +658,7 @@ update msg model =
 
                         -- , notes = Note.replace updatedNote model.notes
                       }
-                    , sendToBackend config.timeoutInMs SentToBackendResult (UpdateNote model.currentUser updatedNote)
+                    , sendToBackend (UpdateNote model.currentUser updatedNote)
                     )
 
         DeleteCurrentNote ->
@@ -715,7 +672,7 @@ update msg model =
                         , deleteNoteSafety = DeleteNoteSafetyOn
                         , notes = Note.remove note model.notes
                       }
-                    , sendToBackend config.timeoutInMs SentToBackendResult (DeleteNote model.currentUser note)
+                    , sendToBackend (DeleteNote model.currentUser note)
                     )
 
         GotNewNoteName str ->
@@ -1488,7 +1445,7 @@ createNote model =
                 , appMode = UserNotes EditingNote
                 , counter = model.counter + 1
               }
-            , sendToBackend config.timeoutInMs SentToBackendResult (CreateNote model.currentUser n)
+            , sendToBackend (CreateNote model.currentUser n)
             )
 
 

@@ -1,2 +1,2 @@
-rm -rf /Users/carlson/.elm
-rm -rf elm-stuff/
+rm -rf ./lamdera-stuff
+rm -rf ~/.lamdera
