@@ -112,7 +112,6 @@ type FrontendMsg
     | SendUsers
       -- App
     | SetAppMode AppMode
-      -- | SentToBackendResult (Result WsError ())
     | TimeChange Posix
     | SetManualVislble Bool
       -- User
