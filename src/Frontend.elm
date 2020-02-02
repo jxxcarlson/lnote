@@ -24,7 +24,7 @@ import Graph exposing (Option(..))
 import Html exposing (Html, time)
 import Html.Attributes as HA
 import Keyboard exposing (Key(..))
-import Lamdera.Frontend exposing (sendToBackend)
+import Lamdera exposing (sendToBackend)
 import Markdown
 import Note exposing (Note)
 import Random
@@ -41,7 +41,7 @@ import Utility
 
 
 app =
-    Lamdera.Frontend.application
+    Lamdera.frontend
         { init = \_ _ -> init
         , onUrlRequest = ClickLink
         , onUrlChange = ChangeUrl

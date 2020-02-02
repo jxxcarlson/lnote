@@ -1,0 +1,32 @@
+{
+  "name": "tt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf /Users/carlson/.lamdera/*; rm -rf ./lamdera-stuff",
+    "build": "lamdera make src/Frontend.elm; lamdera make src/Backend.elm",
+    "frontend": "lamdera make src/Frontend.elm",
+    "backend": "lamdera make src/Backend.elm",
+    "optimize": "lamdera make --optimize src/Frontend.elm; lamdera make --optimize  src/Backend.elm",
+    "go": "open -a /Applications/GoogleChrome.app https://time-logger.lamdera.app",
+    "publish": "git push lamdera",
+    "lamdera": "open -a /Applications/GoogleChrome.app https://dashboard.lamdera.app"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jxxcarlson/ltt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jxxcarlson/ltt/issues"
+  },
+  "homepage": "https://github.com/jxxcarlson/ltt#readme"
+}

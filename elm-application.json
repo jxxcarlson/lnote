@@ -1,0 +1,12 @@
+{
+    "name": "jxxcarlson/simulator",
+    "summary": "virtual economy simulator",
+    "version": "1.0.0",
+    "exposed-modules": [
+        "FrequencyDict"
+        , "Note"
+        , "TypedTime"
+        , "Utility"
+        , "DateTime"
+    ]
+}

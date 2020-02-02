@@ -3,7 +3,7 @@ module Backend exposing (app, userList)
 import Dict exposing (Dict)
 import FrequencyDict exposing (FrequencyDict)
 import Frontend
-import Lamdera.Backend exposing (ClientId, sendToFrontend)
+import Lamdera exposing (ClientId, SessionId)
 import Maybe.Extra
 import Note exposing (Note)
 import Set exposing (Set)
@@ -14,7 +14,7 @@ import UserData
 
 
 app =
-    Lamdera.Backend.application
+    Lamdera.backend
         { init = init
         , update = update
         , subscriptions = \m -> Sub.none
@@ -28,7 +28,6 @@ app =
 --
 
 
-init : ( BackendModel, Cmd BackendMsg )
 init =
     ( { passwordDict = TestData.passwordDict
       , userDict = TestData.userDict
@@ -56,8 +55,8 @@ update msg model =
 --             ( model, Cmd.none )
 
 
-updateFromFrontend : ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
-updateFromFrontend clientId msg model =
+updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
+updateFromFrontend sessionId clientId msg model =
     case msg of
         NoOpToBackend ->
             ( model, Cmd.none )
@@ -194,7 +193,7 @@ updateFromFrontend clientId msg model =
 
 sendToFrontend : ClientId -> ToFrontend -> Cmd BackendMsg
 sendToFrontend clientId msg =
-    Lamdera.Backend.sendToFrontend clientId msg
+    Lamdera.sendToFrontend clientId msg
 
 
 
