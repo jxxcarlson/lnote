@@ -188,7 +188,7 @@ updateFromBackend msg model =
             ( { model | frequencyDict = fD }, Cmd.none )
 
         SendUUIDToFrontend uuid ->
-            ( { model | uuid = Debug.log "UUID (2)" (Just (UUID.toString uuid)) }, Cmd.none )
+            ( { model | uuid = Just (UUID.toString uuid) }, Cmd.none )
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg
