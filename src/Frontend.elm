@@ -1879,7 +1879,7 @@ toggleManualButton model =
         False ->
             Input.button Style.button
                 { onPress = Just (SetManualVislble True)
-                , label = Element.text "Show Manual"
+                , label = Element.text "Show Manual "
                 }
 
 
