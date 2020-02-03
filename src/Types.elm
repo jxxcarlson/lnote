@@ -17,9 +17,11 @@ import FrequencyDict exposing (FrequencyDict)
 import Keyboard exposing (Key(..))
 import Lamdera exposing (ClientId)
 import Note exposing (Note)
+import Random
 import Set exposing (Set)
 import Time exposing (Posix)
 import TypedTime exposing (..)
+import UUID exposing (UUID)
 import Url exposing (Url)
 import User exposing (PasswordDict, User, UserDict)
 import UserData
@@ -29,6 +31,8 @@ type alias BackendModel =
     { passwordDict : PasswordDict
     , userDict : UserDict Note
     , clients : Set ClientId
+    , randomSeed : Random.Seed
+    , uuidCount : Int
     }
 
 
@@ -67,6 +71,7 @@ type alias FrontendModel =
     , noteCameBeforeString : String
     , noteCameAfterString : String
     , deleteNoteSafety : DeleteNoteSafety
+    , uuid : Maybe UUID
     }
 
 
@@ -82,6 +87,7 @@ type ToBackend
     | DeleteNote (Maybe User) Note
     | UpdateNote (Maybe User) Note
     | UpdateTags (Maybe User) Note
+    | RequestUUID
 
 
 type ToFrontend
@@ -92,6 +98,7 @@ type ToFrontend
     | SendUserList (List User)
     | SendNotesToFrontend (List Note)
     | SendNoteToFrontend Note
+    | SendUUIDToFrontend UUID
 
 
 type BackendMsg

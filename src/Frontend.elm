@@ -86,6 +86,7 @@ config =
     }
 
 
+initialModel : Model
 initialModel =
     { input = "App started"
     , message = "Please sign in"
@@ -114,14 +115,15 @@ initialModel =
     , frequencyDict = Dict.empty
     , noteBody = ""
     , tagString = ""
+    , noteFilterString = ""
     , newSubject = ""
     , changedSubject = ""
-    , noteFilterString = ""
     , textFilterString = ""
     , tagFilterString = ""
     , deleteNoteSafety = DeleteNoteSafetyOn
     , noteCameBeforeString = ""
     , noteCameAfterString = ""
+    , uuid = Nothing
     }
 
 
@@ -183,6 +185,9 @@ updateFromBackend msg model =
 
         SendFrequencyDict fD ->
             ( { model | frequencyDict = fD }, Cmd.none )
+
+        SendUUIDToFrontend uuid ->
+            ( { model | uuid = Just uuid }, Cmd.none )
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg
@@ -726,6 +731,7 @@ update msg model =
 
 
 
+-- sendToBackend (SendSignInInfo model.username model.password) )
 --
 -- VIEW
 --

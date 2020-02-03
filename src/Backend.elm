@@ -6,9 +6,11 @@ import Frontend
 import Lamdera exposing (ClientId, SessionId)
 import Maybe.Extra
 import Note exposing (Note)
+import Random
 import Set exposing (Set)
 import TestData exposing (passwordDict, userDict, userInfo1)
 import Types exposing (..)
+import UUID
 import User exposing (PasswordDict, User, UserDict, UserInfo, Username)
 import UserData
 
@@ -29,9 +31,11 @@ app =
 
 
 init =
-    ( { passwordDict = Dict.empty
-      , userDict = Dict.empty
+    ( { passwordDict = TestData.passwordDict -- Dict.empty
+      , userDict = TestData.userDict -- Dict.empty
       , clients = Set.empty
+      , randomSeed = Random.initialSeed 1720485
+      , uuidCount = 0
       }
     , Cmd.none
     )
@@ -178,6 +182,18 @@ updateFromFrontend sessionId clientId msg model =
 
         ClientJoin ->
             ( model, Cmd.none )
+
+        RequestUUID ->
+            let
+                ( newUUID, newSeed ) =
+                    Random.step UUID.generator model.randomSeed
+            in
+            ( { model
+                | randomSeed = newSeed
+                , uuidCount = model.uuidCount + 1
+              }
+            , sendToFrontend clientId (SendUUIDToFrontend newUUID)
+            )
 
 
 sendToFrontend : ClientId -> ToFrontend -> Cmd BackendMsg
