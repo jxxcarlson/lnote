@@ -40,10 +40,10 @@ app =
 
 
 init =
-    ( { passwordDict = TestData.passwordDict -- Dict.empty
-      , userDict = TestData.userDict -- Dict.empty
+    ( { passwordDict = Dict.empty
+      , userDict = Dict.empty
       , clients = Set.empty
-      , randomSeed = Random.initialSeed 1720485
+      , randomSeed = Random.initialSeed 1727485
       , uuidCount = 0
       , randomAtmosphericInt = Nothing
       }

@@ -834,7 +834,7 @@ noUserView model =
 
 noUserLHS model =
     column Style.mainColumnX
-        [ el [ Font.size 18, Font.bold, paddingXY 0 12 ] (text "Welcome!")
+        [ el [ Font.size 18, Font.bold, paddingXY 0 12 ] (text "Welcome to Lamdera Notes")
         , inputUserName model
         , inputPassword model
         , showIf (model.appMode == UserValidation SignUpState) (inputEmail model)
