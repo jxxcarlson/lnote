@@ -14,6 +14,7 @@ module Evergreen.Type.V8 exposing
 import Browser exposing (UrlRequest)
 import Debounce exposing (Debounce)
 import FrequencyDict exposing (FrequencyDict)
+import Http
 import Keyboard exposing (Key(..))
 import Lamdera exposing (ClientId)
 import Note exposing (Note)
@@ -33,6 +34,7 @@ type alias BackendModel =
     , clients : Set ClientId
     , randomSeed : Random.Seed
     , uuidCount : Int
+    , randomAtmosphericInt : Maybe Int
     }
 
 
@@ -103,6 +105,7 @@ type ToFrontend
 
 type BackendMsg
     = NoOpBackendMsg
+    | GotAtomsphericRandomNumber (Result Http.Error String)
 
 
 
