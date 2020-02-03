@@ -21,7 +21,7 @@ a new seed from random.org
 -}
 maxUUIDCount : Int
 maxUUIDCount =
-    2
+    300
 
 
 app =
