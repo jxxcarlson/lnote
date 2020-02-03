@@ -44,17 +44,6 @@ update msg model =
             ( model, Cmd.none )
 
 
-
--- -- Our sendToFrontend Cmd has completed
--- SentToFrontendResult clientId result ->
---     case result of
---         Ok () ->
---             ( model, Cmd.none )
---
---         Err _ ->
---             ( model, Cmd.none )
-
-
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 updateFromFrontend sessionId clientId msg model =
     case msg of
