@@ -135,7 +135,7 @@ init =
 
 subscriptions model =
     Sub.batch
-        [ Time.every 100000 TimeChange
+        [ Time.every 1000 TimeChange
         , Sub.map KeyboardMsg Keyboard.subscriptions
         ]
 
@@ -1440,10 +1440,6 @@ type alias UpdateNoteRecord =
 
 createNote : Model -> ( Model, Cmd FrontendMsg )
 createNote model =
-    let
-        _ =
-            Debug.log "UUID" model.uuid
-    in
     case ( newNote model, model.uuid ) of
         ( Nothing, _ ) ->
             ( model, Cmd.none )
