@@ -28,7 +28,7 @@ userInfo1 =
 
 n1 : Note
 n1 =
-    { id = 1
+    { id = "768e0023-55fa-4c68-b24b-8d6891e05c03"
     , subject = "Example"
     , body = someText
     , tags = [ "foo", "bar" ]
@@ -62,9 +62,9 @@ Malesuada vel per interdum ut nulla mattis, aliquet amet risus malesuada massa o
 
 n2 : Note
 n2 =
-    { id = 2
-    , subject = "BBB"
-    , body = "Also a test"
+    { id = "1f9aba44-754e-4d60-ad02-3c59e48ebdf4"
+    , subject = "Test"
+    , body = "Just a test"
     , tags = []
     , timeCreated = Time.millisToPosix 1563454248000
     , timeModified = Time.millisToPosix 1563454248000

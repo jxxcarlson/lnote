@@ -35,6 +35,7 @@ import Text
 import Time exposing (Posix)
 import TypedTime exposing (..)
 import Types exposing (AppMode(..), BackendMsg(..), DeleteNoteSafety(..), FrontendModel, FrontendMsg(..), NotesMode(..), ToBackend(..), ToFrontend(..), ValidationState(..))
+import UUID
 import Url exposing (Url)
 import User exposing (User, Username)
 import Utility
@@ -134,7 +135,7 @@ init =
 
 subscriptions model =
     Sub.batch
-        [ Time.every 1000 TimeChange
+        [ Time.every 100000 TimeChange
         , Sub.map KeyboardMsg Keyboard.subscriptions
         ]
 
@@ -187,7 +188,7 @@ updateFromBackend msg model =
             ( { model | frequencyDict = fD }, Cmd.none )
 
         SendUUIDToFrontend uuid ->
-            ( { model | uuid = Just uuid }, Cmd.none )
+            ( { model | uuid = Debug.log "UUID (2)" (Just (UUID.toString uuid)) }, Cmd.none )
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg
@@ -608,7 +609,7 @@ update msg model =
         MakeNewNote ->
             let
                 n =
-                    Note.make -1 "New Note" "XXX" model.currentTime
+                    Note.make "difidufi-fodjfod-djf" "New Note" "XXX" model.currentTime
             in
             ( { model
                 | appMode = UserNotes CreatingNote
@@ -618,7 +619,7 @@ update msg model =
                 , tagString = ""
                 , counter = model.counter + 1
               }
-            , Cmd.none
+            , sendToBackend RequestUUID
             )
 
         FECreateNote ->
@@ -1285,7 +1286,7 @@ setCurrentNoteButton : Model -> Note -> Int -> Element FrontendMsg
 setCurrentNoteButton model note index =
     Input.button (Style.titleButton (Just note == model.maybeCurrentNote))
         { onPress = Just FENoop
-        , label = el [ Font.bold ] (Element.text <| String.fromInt note.id)
+        , label = el [ Font.bold ] (Element.text <| String.slice 0 4 note.id)
         }
 
 
@@ -1298,7 +1299,7 @@ viewNotes model =
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
                   , width = px 30
-                  , view = \k note -> el [ Font.size 12 ] (text <| String.fromInt note.id)
+                  , view = \k note -> el [ Font.size 12 ] (text <| String.slice 0 4 note.id)
                   }
                 , { header = el [ Font.bold ] (text <| "Modified")
                   , width = px 90
@@ -1439,19 +1440,30 @@ type alias UpdateNoteRecord =
 
 createNote : Model -> ( Model, Cmd FrontendMsg )
 createNote model =
-    case newNote model of
-        Nothing ->
+    let
+        _ =
+            Debug.log "UUID" model.uuid
+    in
+    case ( newNote model, model.uuid ) of
+        ( Nothing, _ ) ->
             ( model, Cmd.none )
 
-        Just n ->
+        ( _, Nothing ) ->
+            ( model, Cmd.none )
+
+        ( Just n, Just uuid ) ->
+            let
+                newNote_ =
+                    { n | id = uuid }
+            in
             ( { model
-                | maybeCurrentNote = Just n
-                , changedSubject = n.subject
-                , noteBody = n.body
+                | maybeCurrentNote = Just newNote_
+                , changedSubject = newNote_.subject
+                , noteBody = newNote_.body
                 , appMode = UserNotes EditingNote
                 , counter = model.counter + 1
               }
-            , sendToBackend (CreateNote model.currentUser n)
+            , sendToBackend (CreateNote model.currentUser newNote_)
             )
 
 
@@ -1459,7 +1471,7 @@ makeNewNote : Model -> Model
 makeNewNote model =
     let
         n =
-            Note.make -1 "New Note" "XXX" model.currentTime
+            Note.make "dkjfldsjfldjf-dfjldf" "New Note" "XXX" model.currentTime
     in
     { model
         | appMode = UserNotes CreatingNote
@@ -1495,7 +1507,7 @@ newNote model =
                     model.currentTime
             in
             Just <|
-                { id = -1
+                { id = "kfjkfjdfkjdlfjdlf"
                 , subject = model.newSubject
                 , body = model.noteBody
                 , tags = Note.tagsFromString model.tagString

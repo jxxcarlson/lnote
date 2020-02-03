@@ -71,7 +71,7 @@ type alias FrontendModel =
     , noteCameBeforeString : String
     , noteCameAfterString : String
     , deleteNoteSafety : DeleteNoteSafety
-    , uuid : Maybe UUID
+    , uuid : Maybe String
     }
 
 

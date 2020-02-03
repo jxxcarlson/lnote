@@ -14,14 +14,11 @@ create username note userDict =
 
         Just userInfo ->
             let
-                newNote =
-                    { note | id = userInfo.counter + 1 }
-
                 updater : Maybe (UserInfo Note) -> Maybe (UserInfo Note)
                 updater =
-                    Maybe.map (\uInfo -> { uInfo | counter = uInfo.counter + 1, data = newNote :: uInfo.data })
+                    Maybe.map (\uInfo -> { uInfo | counter = uInfo.counter + 1, data = note :: uInfo.data })
             in
-            Ok ( newNote, Dict.update username updater userDict )
+            Ok ( note, Dict.update username updater userDict )
 
 
 update : Username -> Note -> UserDict Note -> Result String ( Note, UserDict Note )

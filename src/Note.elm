@@ -38,7 +38,7 @@ import Time exposing (Posix, toHour, toMinute, toSecond, utc)
 
 
 type alias Note =
-    { id : Int
+    { id : String
     , subject : String
     , tags : List String
     , body : String
@@ -65,7 +65,7 @@ toYaml : Note -> String
 toYaml note =
     "- note\n"
         ++ "   - id: "
-        ++ String.fromInt note.id
+        ++ note.id
         ++ "\n"
         ++ "   - subject: "
         ++ note.subject
@@ -115,12 +115,12 @@ toUtcString time =
         ++ " (UTC)"
 
 
-make : Int -> String -> String -> Posix -> Note
+make : String -> String -> String -> Posix -> Note
 make id subject body posix =
     { id = id
     , subject = subject
-    , tags = []
     , body = body
+    , tags = []
     , timeCreated = posix
     , timeModified = posix
     , selected = True
