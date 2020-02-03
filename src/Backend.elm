@@ -3,6 +3,7 @@ module Backend exposing (app, userList)
 import Dict exposing (Dict)
 import FrequencyDict exposing (FrequencyDict)
 import Frontend
+import Http
 import Lamdera exposing (ClientId, SessionId)
 import Maybe.Extra
 import Note exposing (Note)
@@ -13,6 +14,14 @@ import Types exposing (..)
 import UUID
 import User exposing (PasswordDict, User, UserDict, UserInfo, Username)
 import UserData
+
+
+{-| After maxUUIDCount UUIDs are generated, get
+a new seed from random.org
+-}
+maxUUIDCount : Int
+maxUUIDCount =
+    2
 
 
 app =
@@ -36,6 +45,7 @@ init =
       , clients = Set.empty
       , randomSeed = Random.initialSeed 1720485
       , uuidCount = 0
+      , randomAtmosphericInt = Nothing
       }
     , Cmd.none
     )
@@ -46,6 +56,28 @@ update msg model =
     case msg of
         NoOpBackendMsg ->
             ( model, Cmd.none )
+
+        GotAtomsphericRandomNumber result ->
+            case result of
+                Ok str ->
+                    case String.toInt (String.trim str) of
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                        Just rn ->
+                            let
+                                newRandomSeed =
+                                    Random.initialSeed rn
+                            in
+                            ( { model
+                                | randomAtmosphericInt = Just rn
+                                , randomSeed = newRandomSeed
+                              }
+                            , Cmd.none
+                            )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
@@ -185,14 +217,26 @@ updateFromFrontend sessionId clientId msg model =
 
         RequestUUID ->
             let
+                ( count, cmd ) =
+                    case model.uuidCount < maxUUIDCount of
+                        True ->
+                            ( model.uuidCount + 1, Cmd.none )
+
+                        False ->
+                            ( 0, getRandomNumber )
+            in
+            let
                 ( newUUID, newSeed ) =
                     Random.step UUID.generator model.randomSeed
             in
             ( { model
                 | randomSeed = newSeed
-                , uuidCount = model.uuidCount + 1
+                , uuidCount = count
               }
-            , sendToFrontend clientId (SendUUIDToFrontend newUUID)
+            , Cmd.batch
+                [ sendToFrontend clientId (SendUUIDToFrontend newUUID)
+                , cmd
+                ]
             )
 
 
@@ -228,3 +272,28 @@ updateFrequencyDictionary username userDict =
                     { userInfo | tagDict = fD }
             in
             ( fD, Dict.insert username newUserInfo userDict )
+
+
+getRandomNumber : Cmd BackendMsg
+getRandomNumber =
+    Http.get
+        { url = randomNumberUrl 9
+        , expect = Http.expectString GotAtomsphericRandomNumber
+        }
+
+
+{-| maxDigits < 10
+-}
+randomNumberUrl : Int -> String
+randomNumberUrl maxDigits =
+    let
+        maxNumber =
+            10 ^ maxDigits
+
+        prefix =
+            "https://www.random.org/integers/?num=1&min=1&max="
+
+        suffix =
+            "&col=1&base=10&format=plain&rnd=new"
+    in
+    prefix ++ String.fromInt maxNumber ++ suffix

@@ -135,7 +135,7 @@ init =
 
 subscriptions model =
     Sub.batch
-        [ Time.every 1000 TimeChange
+        [ Time.every 100000 TimeChange
         , Sub.map KeyboardMsg Keyboard.subscriptions
         ]
 

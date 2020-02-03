@@ -28,7 +28,7 @@ userInfo1 =
 
 n1 : Note
 n1 =
-    { id = "768e0023-55fa-4c68-b24b-8d6891e05c03"
+    { id = "768e0023-55fa-4c68-b24b-8d6891e05c03 "
     , subject = "Example"
     , body = someText
     , tags = [ "foo", "bar" ]
