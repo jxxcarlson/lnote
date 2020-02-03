@@ -94,7 +94,7 @@ updateFromFrontend sessionId clientId msg model =
                     ( { model | passwordDict = newPasswordDict }, sendToFrontend clientId <| SendMessage <| "Password changed" )
 
                 False ->
-                    ( model, sendToFrontend clientId <| SendMessage "Could not change password!" )
+                    ( model, sendToFrontend clientId <| SendMessage "Could not change password!!" )
 
         SendSignUpInfo username password email ->
             case User.add username password email ( model.passwordDict, model.userDict ) of
