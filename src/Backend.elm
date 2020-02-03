@@ -1,7 +1,5 @@
 module Backend exposing (app, userList)
 
--- import TestData exposing (passwordDict, userDict, userInfo1)
-
 import Dict exposing (Dict)
 import FrequencyDict exposing (FrequencyDict)
 import Frontend
@@ -9,6 +7,7 @@ import Lamdera exposing (ClientId, SessionId)
 import Maybe.Extra
 import Note exposing (Note)
 import Set exposing (Set)
+import TestData exposing (passwordDict, userDict, userInfo1)
 import Types exposing (..)
 import User exposing (PasswordDict, User, UserDict, UserInfo, Username)
 import UserData
@@ -30,8 +29,8 @@ app =
 
 
 init =
-    ( { passwordDict = model.passwordDict
-      , userDict = model.userDict
+    ( { passwordDict = Dict.empty
+      , userDict = Dict.empty
       , clients = Set.empty
       }
     , Cmd.none

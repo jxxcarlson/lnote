@@ -789,7 +789,7 @@ makeNewNoteButton model =
     Input.button
         ((Style.select <| model.appMode == UserNotes CreatingNote) Style.selectedHeaderButton Style.headerButton)
         { onPress = Just MakeNewNote
-        , label = Element.text "Create"
+        , label = Element.text "New"
         }
 
 
