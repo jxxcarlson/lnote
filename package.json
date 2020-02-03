@@ -13,7 +13,7 @@
     "frontend": "lamdera make src/Frontend.elm",
     "backend": "lamdera make src/Backend.elm",
     "optimize": "lamdera make --optimize src/Frontend.elm; lamdera make --optimize  src/Backend.elm",
-    "go": "open -a /Applications/GoogleChrome.app https://time-logger.lamdera.app",
+    "go": "open -a /Applications/GoogleChrome.app https://notes.lamdera.app",
     "publish": "git push lamdera",
     "lamdera": "open -a /Applications/GoogleChrome.app https://dashboard.lamdera.app"
 
