@@ -766,6 +766,7 @@ activeFooter model =
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
         , hideIf (model.currentUser == Nothing) downloadButton
         , toggleManualButton model
+        , el [] (text "v3")
         ]
 
 
