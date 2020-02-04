@@ -79,6 +79,15 @@ type alias Model =
 --
 
 
+type alias Config =
+    { debounceInterval : Float
+    , timeoutInMs : Int
+    , panelHeight : Float
+    , panelWidth : Float
+    }
+
+
+config : Config
 config =
     { debounceInterval = 500
     , timeoutInMs = 5 * 1000
@@ -850,12 +859,16 @@ noUserLHS model =
         ]
 
 
+pxFloat =
+    round >> px
+
+
 noUserRHS model =
     column [ padding 40, spacing 18, Font.size 16 ]
         [ el [ Font.bold, Font.size 24 ]
             (text "Screenshot of app")
         , image
-            [ width (px config.panelWidth) ]
+            [ width (pxFloat config.panelWidth) ]
             { src = "http://noteimages.s3.amazonaws.com/jim_images/notes-screen.png"
             , description = "screenshot of app"
             }
@@ -1171,7 +1184,7 @@ editNotePanel model =
 
 
 inputNoteBody model =
-    Input.multiline (Style.multiline 320 (config.panelHeight - 85))
+    Input.multiline (Style.multiline 400 (round (config.panelHeight - 85)))
         { onChange = GotNoteBody
         , text = model.noteBody
         , placeholder = Nothing
@@ -1234,7 +1247,7 @@ deleteNoteButton model =
 
 
 inputNewNoteName model =
-    Input.text (Style.inputStyle 200)
+    Input.text (Style.inputStyle 285)
         { onChange = GotNewNoteName
         , text = model.newSubject
         , placeholder = Nothing
@@ -1243,7 +1256,7 @@ inputNewNoteName model =
 
 
 inputNoteTags model =
-    Input.text (Style.inputStyle 285)
+    Input.text (Style.inputStyle 365)
         { onChange = GotTagString
         , text = model.tagString
         , placeholder = Nothing
@@ -1252,7 +1265,7 @@ inputNoteTags model =
 
 
 inputChangedSubject model =
-    Input.text (Style.inputStyle 230)
+    Input.text (Style.inputStyle 315)
         { onChange = GotChangedSubject
         , text = model.changedSubject
         , placeholder = Nothing
@@ -1269,7 +1282,7 @@ inputChangedSubject model =
 
 noteListPanel : Model -> Element FrontendMsg
 noteListPanel model =
-    column [ spacing 20, height (px config.panelHeight), width (px (config.panelWidth - 50)), Border.width 1 ]
+    column [ spacing 20, height (pxFloat config.panelHeight), width (pxFloat <| 0.9 * config.panelWidth - 50), Border.width 1 ]
         [ viewNotes model
         ]
 
@@ -1294,12 +1307,12 @@ viewNotes : Model -> Element FrontendMsg
 viewNotes model =
     column [ spacing 12, padding 20, height (px 510) ]
         [ el [ Font.size 16, Font.bold ] (text "Notes")
-        , indexedTable [ spacing 4, Font.size 12, height (px (config.panelHeight - 50)), scrollbarY ]
+        , indexedTable [ spacing 4, Font.size 12, height (pxFloat (config.panelHeight - 50)), scrollbarY ]
             { data = List.filter (\note -> note.selected) model.notes
             , columns =
                 [ { header = el [ Font.bold ] (text <| idLabel model)
-                  , width = px 30
-                  , view = \k note -> el [ Font.size 12 ] (text <| String.slice 0 4 note.id)
+                  , width = px 36
+                  , view = \k note -> el [ Font.size 12, Font.family [ Font.typeface "Courier New", Font.monospace ] ] (text <| String.slice 0 4 note.id)
                   }
                 , { header = el [ Font.bold ] (text <| "Modified")
                   , width = px 90
@@ -1324,7 +1337,7 @@ viewNote : Maybe Note -> Element FrontendMsg
 viewNote maybeNote =
     case maybeNote of
         Nothing ->
-            column [ padding 20, spacing 20, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
+            column [ padding 20, spacing 20, height (pxFloat config.panelHeight), width (pxFloat config.panelWidth), Border.width 1 ]
                 [ el [ Font.size 12 ] (text "No note selected")
                 ]
 
@@ -1358,7 +1371,7 @@ viewNote maybeNote =
                 content =
                     title ++ created ++ modified ++ words ++ tags ++ hr ++ note.body
             in
-            column [ padding 20, spacing 12, height (px config.panelHeight), width (px config.panelWidth), Border.width 1 ]
+            column [ padding 20, spacing 12, height (pxFloat config.panelHeight), width (pxFloat config.panelWidth), Border.width 1 ]
                 [ toMarkdown content |> Element.html
                 ]
 
@@ -1371,7 +1384,7 @@ tagButtons model =
         |> List.take 20
         |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
         |> (\x -> x ++ [ clearTagSearch ])
-        |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (px (2 * config.panelWidth - 60)) ] x)
+        |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (pxFloat (2 * config.panelWidth - 60)) ] x)
 
 
 tagButton : ( String, Int ) -> Element FrontendMsg
@@ -1842,7 +1855,7 @@ myOptions =
 
 markdownStyle =
     [ HA.style "font-size" "14px"
-    , HA.style "width" (String.fromInt (config.panelWidth - 40) ++ "px")
+    , HA.style "width" (pxString <| config.panelWidth - 40)
     , HA.style "overflow-y" "scroll"
     , HA.style "white-space" "normal"
     , HA.style "line-height" "1.4"
@@ -1851,6 +1864,11 @@ markdownStyle =
 
     -- , HA.style "p" "display: inline-block"
     ]
+
+
+pxString : Float -> String
+pxString f =
+    String.fromFloat f ++ "px"
 
 
 toMarkdown : String -> Html FrontendMsg
@@ -1867,8 +1885,8 @@ toMarkdown userInput =
 viewText : String -> Element FrontendMsg
 viewText str =
     column
-        [ width (px config.panelWidth)
-        , height (px config.panelHeight)
+        [ width (pxFloat config.panelWidth)
+        , height (pxFloat config.panelHeight)
         , padding 20
         , scrollbarY
         , Border.width 1
