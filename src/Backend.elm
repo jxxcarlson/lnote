@@ -230,8 +230,8 @@ updateFromFrontend sessionId clientId msg model =
                     Random.step UUID.generator model.randomSeed
             in
             ( { model
-                | randomSeed = Debug.log "newSeed" newSeed
-                , uuidCount = Debug.log "concount" count
+                | randomSeed = newSeed
+                , uuidCount = count
               }
             , Cmd.batch
                 [ sendToFrontend clientId (SendUUIDToFrontend newUUID)
