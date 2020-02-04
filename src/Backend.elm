@@ -151,19 +151,40 @@ updateFromFrontend sessionId clientId msg model =
                     ( model, Cmd.none )
 
                 Just user ->
+                    let
+                        _ =
+                            Debug.log "USER" user.username
+                    in
                     case UserData.create user.username note model.userDict of
                         Err str ->
                             ( model, Cmd.none )
 
                         Ok ( newNote, userDict ) ->
                             let
+                                ( count, getRandomNumberCmd ) =
+                                    case model.uuidCount < maxUUIDCount of
+                                        True ->
+                                            ( model.uuidCount + 1, Cmd.none )
+
+                                        False ->
+                                            ( 0, getRandomNumber )
+
+                                ( newUUID, newSeed ) =
+                                    Debug.log "(uu, ss)" <|
+                                        Random.step UUID.generator model.randomSeed
+
                                 ( fD, newUserDict ) =
                                     updateFrequencyDictionary user.username userDict
                             in
-                            ( { model | userDict = newUserDict }
+                            ( { model
+                                | userDict = newUserDict
+                                , uuidCount = count
+                                , randomSeed = newSeed
+                              }
                             , Cmd.batch
-                                [ sendToFrontend clientId (SendNoteToFrontend newNote)
+                                [ sendToFrontend clientId (SendNoteToFrontend { newNote | id = UUID.toString newUUID })
                                 , sendToFrontend clientId <| SendFrequencyDict fD
+                                , getRandomNumberCmd
                                 ]
                             )
 
@@ -214,30 +235,6 @@ updateFromFrontend sessionId clientId msg model =
 
         ClientJoin ->
             ( model, Cmd.none )
-
-        RequestUUID ->
-            let
-                ( count, cmd ) =
-                    case model.uuidCount < maxUUIDCount of
-                        True ->
-                            ( model.uuidCount + 1, Cmd.none )
-
-                        False ->
-                            ( 0, getRandomNumber )
-            in
-            let
-                ( newUUID, newSeed ) =
-                    Random.step UUID.generator model.randomSeed
-            in
-            ( { model
-                | randomSeed = newSeed
-                , uuidCount = count
-              }
-            , Cmd.batch
-                [ sendToFrontend clientId (SendUUIDToFrontend newUUID)
-                , cmd
-                ]
-            )
 
 
 sendToFrontend : ClientId -> ToFrontend -> Cmd BackendMsg

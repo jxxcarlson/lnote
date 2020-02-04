@@ -89,7 +89,6 @@ type ToBackend
     | DeleteNote (Maybe User) Note
     | UpdateNote (Maybe User) Note
     | UpdateTags (Maybe User) Note
-    | RequestUUID
 
 
 type ToFrontend
@@ -100,7 +99,6 @@ type ToFrontend
     | SendUserList (List User)
     | SendNotesToFrontend (List Note)
     | SendNoteToFrontend Note
-    | SendUUIDToFrontend UUID
 
 
 type BackendMsg
@@ -146,7 +144,6 @@ type FrontendMsg
     | SetCurrentNote Note
     | DeleteCurrentNote
     | MakeNewNote
-    | FECreateNote
     | FEEditNote
     | DoUpdateNote
     | GotNoteDateBeforeFilter String

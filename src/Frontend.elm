@@ -144,7 +144,7 @@ init =
 
 subscriptions model =
     Sub.batch
-        [ Time.every 1000 TimeChange
+        [ Time.every 10000 TimeChange
         , Sub.map KeyboardMsg Keyboard.subscriptions
         ]
 
@@ -195,9 +195,6 @@ updateFromBackend msg model =
 
         SendFrequencyDict fD ->
             ( { model | frequencyDict = fD }, Cmd.none )
-
-        SendUUIDToFrontend uuid ->
-            ( { model | uuid = Just (UUID.toString uuid) }, Cmd.none )
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg
@@ -616,22 +613,6 @@ update msg model =
             ( { model | notes = newNotes, maybeCurrentNote = Note.firstSelectedNote newNotes }, Cmd.none )
 
         MakeNewNote ->
-            let
-                n =
-                    Note.make "difidufi-fodjfod-djf" "New Note" "XXX" model.currentTime
-            in
-            ( { model
-                | appMode = UserNotes CreatingNote
-                , maybeCurrentNote = Just n
-                , noteBody = n.body
-                , newSubject = n.subject
-                , tagString = ""
-                , counter = model.counter + 1
-              }
-            , sendToBackend RequestUUID
-            )
-
-        FECreateNote ->
             createNote model
 
         FEEditNote ->
@@ -1209,7 +1190,7 @@ noteControls model =
 newNoteButton : Element FrontendMsg
 newNoteButton =
     Input.button Style.button
-        { onPress = Just FECreateNote
+        { onPress = Just MakeNewNote
         , label = Element.text "Create note"
         }
 
@@ -1433,7 +1414,7 @@ idLabel model =
 submitNoteButton : Element FrontendMsg
 submitNoteButton =
     Input.button Style.button
-        { onPress = Just FECreateNote
+        { onPress = Just MakeNewNote
         , label = Element.text "New: minutes or hh:mm"
         }
 
