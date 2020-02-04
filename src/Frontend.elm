@@ -144,7 +144,7 @@ init =
 
 subscriptions model =
     Sub.batch
-        [ Time.every 30000 TimeChange
+        [ Time.every 1000 TimeChange
         , Sub.map KeyboardMsg Keyboard.subscriptions
         ]
 
@@ -747,14 +747,16 @@ mainView model =
 footer model =
     case model.currentUser of
         Nothing ->
-            blankFooter
+            Element.none
 
         Just _ ->
             activeFooter model
 
 
-blankFooter =
-    row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 18 ] []
+blankFooter model =
+    row [ width fill, spacing 18, Background.color Style.charcoal, paddingXY 8 18 ]
+        [ el [ Font.color Style.white, Font.size 12 ] (text model.message)
+        ]
 
 
 activeFooter model =
@@ -766,7 +768,7 @@ activeFooter model =
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (deleteNoteButton model) ]
         , hideIf (model.currentUser == Nothing) downloadButton
         , toggleManualButton model
-        , el [] (text "v3")
+        , el [ Font.color Style.white, Font.size 12 ] (text model.message)
         ]
 
 
