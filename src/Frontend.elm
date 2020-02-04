@@ -144,7 +144,7 @@ init =
 
 subscriptions model =
     Sub.batch
-        [ Time.every 1000 TimeChange
+        [ Time.every 30000 TimeChange
         , Sub.map KeyboardMsg Keyboard.subscriptions
         ]
 
@@ -256,19 +256,6 @@ update msg model =
 
                             else
                                 Cmd.none
-
-                -- ( newModel2, cmd ) =
-                --     case List.member Control pressedKeys of
-                --         False ->
-                --             ( newModel, Cmd.none )
-                --
-                --         True ->
-                --             case List.member (Character "K") pressedKeys of
-                --                 False ->
-                --                     ( newModel, Cmd.none )
-                --
-                --                 True ->
-                --                     createNote newModel
             in
             ( { newModel
                 | pressedKeys = pressedKeys
@@ -1434,26 +1421,19 @@ type alias UpdateNoteRecord =
 
 createNote : Model -> ( Model, Cmd FrontendMsg )
 createNote model =
-    case ( newNote model, model.uuid ) of
-        ( Nothing, _ ) ->
+    case newNote model of
+        Nothing ->
             ( model, Cmd.none )
 
-        ( _, Nothing ) ->
-            ( model, Cmd.none )
-
-        ( Just n, Just uuid ) ->
-            let
-                newNote_ =
-                    { n | id = uuid }
-            in
+        Just note ->
             ( { model
-                | maybeCurrentNote = Just newNote_
-                , changedSubject = newNote_.subject
-                , noteBody = newNote_.body
+                | maybeCurrentNote = Just note
+                , changedSubject = note.subject
+                , noteBody = note.body
                 , appMode = UserNotes EditingNote
                 , counter = model.counter + 1
               }
-            , sendToBackend (CreateNote model.currentUser newNote_)
+            , sendToBackend (CreateNote model.currentUser note)
             )
 
 
@@ -1490,15 +1470,15 @@ editNote model =
 
 newNote : Model -> Maybe Note
 newNote model =
-    case ( model.currentUser, String.length model.newSubject > 0 ) of
-        ( Just user, True ) ->
+    case model.currentUser of
+        Just user ->
             let
                 now =
                     model.currentTime
             in
             Just <|
-                { id = "kfjkfjdfkjdlfjdlf"
-                , subject = model.newSubject
+                { id = "---"
+                , subject = "New Note"
                 , body = model.noteBody
                 , tags = Note.tagsFromString model.tagString
                 , timeCreated = now
