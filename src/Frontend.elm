@@ -1479,7 +1479,7 @@ newNote model =
             Just <|
                 { id = "---"
                 , subject = "New Note"
-                , body = model.noteBody
+                , body = ""
                 , tags = Note.tagsFromString model.tagString
                 , timeCreated = now
                 , timeModified = now
