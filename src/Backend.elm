@@ -151,10 +151,6 @@ updateFromFrontend sessionId clientId msg model =
                     ( model, Cmd.none )
 
                 Just user ->
-                    let
-                        _ =
-                            Debug.log "USER" user.username
-                    in
                     case UserData.create user.username note model.userDict of
                         Err str ->
                             ( model, Cmd.none )
@@ -170,8 +166,7 @@ updateFromFrontend sessionId clientId msg model =
                                             ( 0, getRandomNumber )
 
                                 ( newUUID, newSeed ) =
-                                    Debug.log "(uu, ss)" <|
-                                        Random.step UUID.generator model.randomSeed
+                                    Random.step UUID.generator model.randomSeed
 
                                 ( fD, newUserDict ) =
                                     updateFrequencyDictionary user.username userDict
