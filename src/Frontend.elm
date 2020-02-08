@@ -89,7 +89,7 @@ type alias Config =
 
 config : Config
 config =
-    { debounceInterval = 450
+    { debounceInterval = 455
     , timeoutInMs = 6 * 1000
     , panelHeight = 550
     , panelWidth = 450
