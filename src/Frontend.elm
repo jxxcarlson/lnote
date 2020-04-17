@@ -51,7 +51,7 @@ app =
         , subscriptions = subscriptions
         , view =
             \model ->
-                { title = "Lamdera Notes"
+                { title = "Lamdera Notes (2)"
                 , body = [ view model ]
                 }
         }
