@@ -6,6 +6,7 @@ module Frontend exposing (Model, app)
 -- exposing (..)
 -- import Date exposing (Date)
 
+
 import Array exposing (map)
 import Browser exposing (UrlRequest(..))
 import Browser.Dom as Dom
@@ -48,6 +49,7 @@ import Config exposing(config, Config)
 import KeyCommands as KC
 import Update.Helper
 import Widget.Style
+import Codec
 
 
 app =
@@ -740,7 +742,7 @@ type alias UpdateNoteRecord =
 
 downloadNotes : List Note -> Cmd FrontendMsg
 downloadNotes noteList =
-    Download.string "notes.yaml" "text/yaml" (Note.listToYaml noteList)
+    Download.string "notes.json" "text/json" (Codec.encodeNoteListAsString noteList)
 
 pxString : Float -> String
 pxString f =
