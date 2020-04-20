@@ -1,7 +1,20 @@
-module Utility exposing (randomIntegers, roundTo)
+module Utility exposing (randomIntegers, currentUserIsAdmin, roundTo)
 
+import Types exposing (FrontendModel)
 import Random
 
+type alias Model = FrontendModel
+
+
+
+currentUserIsAdmin : Model -> Bool
+currentUserIsAdmin model =
+    case model.currentUser of
+        Nothing ->
+            False
+
+        Just user ->
+            user.admin
 
 roundTo : Int -> Float -> Float
 roundTo k x =
