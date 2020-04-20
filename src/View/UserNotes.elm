@@ -36,7 +36,7 @@ view model =
             , showIf (model.appMode == UserNotes EditingNote) (editNotePanel model)
             , viewNote model.maybeCurrentNote
             , showIf model.manualVisible manual
-            , hideIf model.manualVisible (tagsView model)
+            , hideIf (model.manualVisible || model.appMode == UserNotes CreatingNote || model.appMode == UserNotes EditingNote) (tagsView model)
             ]
         ]
 
@@ -457,8 +457,11 @@ tagButtonList model =
         |> List.map (\item -> tagButton model.selectedTag item )
 
 tagButton : String -> ( String, Int ) ->  Element FrontendMsg
-tagButton selectedTag ( tag, freq )  =
-    Input.button (Style.titleButton (tag == selectedTag) ++ [ paddingXY 4 0 ])
+tagButton selectedTag ( tag, freq ) =
+    let
+        _ = Debug.log "(tag, selectedTag)" (tag, selectedTag)
+    in
+    Input.button (Style.titleButton ( tag ==  selectedTag) ++ [ paddingXY 4 0 ])
         { onPress = Just (SetTagForSearch tag)
         , label = text (tag ++ ": " ++ String.fromInt freq)
         }

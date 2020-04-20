@@ -388,6 +388,9 @@ update msg model =
             ( { model | email = str }, Cmd.none )
 
         SignIn ->
+          -- let
+          --   _ = Debug.log "SignIn" (model.username, model.password)
+          -- in
             ( initialModel, sendToBackend (SendSignInInfo model.username model.password) )
 
         SignUp ->
@@ -522,6 +525,7 @@ update msg model =
                                 | notes = newNotes
                                 , maybeCurrentNote = Just note
                                 , noteBody = note.body
+                                , selectedTag = tag
                                 , changedSubject = note.subject
                                 , tagString = String.join ", " note.tags
                                 , tagFilterString = tag
