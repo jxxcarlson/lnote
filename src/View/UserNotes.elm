@@ -241,24 +241,18 @@ viewNote maybeNote =
                 [ toMarkdown content |> Element.html
                 ]
 
+--
+-- tagButtons : Model -> Element FrontendMsg
+-- tagButtons model =
+--     model.frequencyDict
+--         |> FrequencyDict.list
+--         |> List.map (\item -> tagButton item)
+--         |> List.take 20
+--         |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
+--         |> (\x -> x ++ [ clearTagSearch ])
+--         |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (pxFloat (2 * config.panelWidth - 60)) ] x)
 
-tagButtons : Model -> Element FrontendMsg
-tagButtons model =
-    model.frequencyDict
-        |> FrequencyDict.list
-        |> List.map (\item -> tagButton item)
-        |> List.take 20
-        |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
-        |> (\x -> x ++ [ clearTagSearch ])
-        |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (pxFloat (2 * config.panelWidth - 60)) ] x)
 
-
-tagButton : ( String, Int ) -> Element FrontendMsg
-tagButton ( tag, freq ) =
-    Input.button (Style.titleButton False ++ [ paddingXY 4 0 ])
-        { onPress = Just (SetTagForSearch tag)
-        , label = text (tag ++ ": " ++ String.fromInt freq)
-        }
 
 
 clearTagSearch : Element FrontendMsg
@@ -460,8 +454,14 @@ tagButtonList : Model -> List (Element FrontendMsg)
 tagButtonList model =
     model.frequencyDict
         |> FrequencyDict.list
-        |> List.map (\item -> tagButton item)
+        |> List.map (\item -> tagButton model.selectedTag item )
 
+tagButton : String -> ( String, Int ) ->  Element FrontendMsg
+tagButton selectedTag ( tag, freq )  =
+    Input.button (Style.titleButton (tag == selectedTag) ++ [ paddingXY 4 0 ])
+        { onPress = Just (SetTagForSearch tag)
+        , label = text (tag ++ ": " ++ String.fromInt freq)
+        }
 
 
 -- MARKDOWN

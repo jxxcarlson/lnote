@@ -70,6 +70,7 @@ type alias FrontendModel =
     , noteFilterString : String
     , textFilterString : String
     , tagFilterString : String
+    , selectedTag : String
     , noteCameBeforeString : String
     , noteCameAfterString : String
     , deleteNoteSafety : DeleteNoteSafety

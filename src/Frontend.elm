@@ -103,6 +103,7 @@ initialModel =
     , changedSubject = ""
     , textFilterString = ""
     , tagFilterString = ""
+    , selectedTag = ""
     , deleteNoteSafety = DeleteNoteSafetyOn
     , noteCameBeforeString = ""
     , noteCameAfterString = ""
