@@ -8,7 +8,7 @@ import Lamdera.Migrations exposing (..)
 frontendModel : Old.FrontendModel -> ModelMigration New.FrontendModel New.FrontendMsg
 frontendModel old =
      ModelMigrated
-        ( input = "App started"
+         ( { input = "App started"
         , message = "Please sign in"
         , pressedKeys = []
         , appMode = UserValidation SignInState
@@ -45,6 +45,7 @@ frontendModel old =
         , noteCameBeforeString = ""
         , noteCameAfterString = ""
         , uuid = Nothing
+      }
         , Cmd.none
         )
 
