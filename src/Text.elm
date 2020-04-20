@@ -10,8 +10,8 @@ saved twice per second (if the text has changed).
 
 - The **Download** button will download
 the current selection to a text file
-`notes.yaml` which represents the
-selection in yaml form.  Thus the notes
+`notes.json` which represents the
+selection in json form.  Thus the notes
 you create are not hostage to the system.
 
 - **Key commands.** Not all key commands correspond to a button.
