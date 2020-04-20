@@ -47,6 +47,7 @@ import View.Admin
 import Config exposing(config, Config)
 import KeyCommands as KC
 import Update.Helper
+import Widget.Style
 
 
 app =
@@ -539,6 +540,7 @@ update msg model =
                 , noteFilterString = ""
                 , textFilterString = ""
                 , tagFilterString = ""
+                , selectedTag = ""
               }
             , Cmd.none
             )
@@ -697,7 +699,9 @@ update msg model =
 
 view : Model -> Html FrontendMsg
 view model =
-    Element.layout [] (mainView model)
+  Element.layoutWith { options =
+      [ focusStyle Widget.Style.noFocus ] }
+     [] (mainView model)
 
 
 mainView : Model -> Element FrontendMsg
