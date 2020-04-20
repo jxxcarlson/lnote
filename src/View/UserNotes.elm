@@ -281,9 +281,14 @@ selectNoteButton : Maybe Note -> Note -> Element FrontendMsg
 selectNoteButton maybeCurrentNote note =
     Input.button (Style.titleButton (maybeCurrentNote == Just note))
         { onPress = Just (SetCurrentNote note)
-        , label = text note.subject
+        , label = text (note.subject |> truncateStringNicely 30)
         }
 
+truncateStringNicely : Int -> String -> String
+truncateStringNicely k str =
+  case String.length str <= k of
+    True -> str
+    False -> String.left k str ++ "..."
 
 idLabel : Model -> String
 idLabel model =
