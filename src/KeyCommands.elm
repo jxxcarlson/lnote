@@ -4,6 +4,7 @@ module KeyCommands exposing(..)
 import Types exposing (FrontendModel, NotesMode(..), AppMode(..))
 import Keyboard exposing (Key(..))
 import Note exposing(..)
+import Update.Helper
 
 type alias Model = FrontendModel
 
@@ -78,7 +79,7 @@ toggleManualUsingKey pressedKeys model =
 editNoteUsingKey : List Key -> Model -> Model
 editNoteUsingKey pressedKeys model =
     if List.member (Character "E") pressedKeys then
-        editNote model
+        Update.Helper.editNote model
 
     else
         model
@@ -87,7 +88,7 @@ editNoteUsingKey pressedKeys model =
 makeNewNoteUsingKey : List Key -> Model -> Model
 makeNewNoteUsingKey pressedKeys model =
     if List.member (Character "N") pressedKeys then
-        makeNewNote model
+        Update.Helper.makeNewNote model
 
     else
         model

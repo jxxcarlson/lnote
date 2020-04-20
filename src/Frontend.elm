@@ -45,7 +45,8 @@ import View.Footer
 import View.Header
 import View.Admin
 import Config exposing(config, Config)
-import KeyCommands
+import KeyCommands as KC
+import Update.Helper
 
 
 app =
@@ -208,14 +209,14 @@ update msg model =
 
                         True ->
                             model
-                                |> toggleManualUsingKey pressedKeys
-                                |> setBrowsingModeUsingKey pressedKeys
-                                |> editNoteUsingKey pressedKeys
-                                |> makeNewNoteUsingKey pressedKeys
-                                |> sortIncreasingByDateUsingKey pressedKeys
-                                |> sortDecreasingByDateUsingKey pressedKeys
-                                |> sortIncreasingAlphabeticallyUsingKey pressedKeys
-                                |> unsortedUsingKey pressedKeys
+                                |> KC.toggleManualUsingKey pressedKeys
+                                |> KC.setBrowsingModeUsingKey pressedKeys
+                                |> KC.editNoteUsingKey pressedKeys
+                                |> KC.makeNewNoteUsingKey pressedKeys
+                                |> KC.sortIncreasingByDateUsingKey pressedKeys
+                                |> KC.sortDecreasingByDateUsingKey pressedKeys
+                                |> KC.sortIncreasingAlphabeticallyUsingKey pressedKeys
+                                |> KC.unsortedUsingKey pressedKeys
 
                 cmd =
                     case List.member Control pressedKeys of
@@ -538,7 +539,7 @@ update msg model =
         GotNoteDateAfterFilter str ->
             let
                 newNotes =
-                    selectNotes model
+                    Update.Helper.selectNotes model
             in
             ( { model
                 | noteCameAfterString = str
@@ -551,7 +552,7 @@ update msg model =
         GotNoteDateBeforeFilter str ->
             let
                 newNotes =
-                    selectNotes model
+                    Update.Helper.selectNotes model
             in
             ( { model
                 | noteCameBeforeString = str
@@ -572,7 +573,7 @@ update msg model =
             ( { model | notes = newNotes, maybeCurrentNote = Note.firstSelectedNote newNotes }, Cmd.none )
 
         MakeNewNote ->
-            createNote model
+            Update.Helper.createNote model
 
         FEEditNote ->
             case model.maybeCurrentNote of
@@ -720,86 +721,86 @@ type alias UpdateNoteRecord =
     , cmd : Cmd FrontendMsg
     }
 
-
-createNote : Model -> ( Model, Cmd FrontendMsg )
-createNote model =
-    case newNote model of
-        Nothing ->
-            ( model, Cmd.none )
-
-        Just note ->
-            ( { model
-                | maybeCurrentNote = Just note
-                , changedSubject = note.subject
-                , noteBody = note.body
-                , appMode = UserNotes EditingNote
-                , counter = model.counter + 1
-              }
-            , sendToBackend (CreateNote model.currentUser note)
-            )
-
-
-makeNewNote : Model -> Model
-makeNewNote model =
-    let
-        n =
-            Note.make "dkjfldsjfldjf-dfjldf" "New Note" "XXX" model.currentTime
-    in
-    { model
-        | appMode = UserNotes CreatingNote
-        , maybeCurrentNote = Just n
-        , noteBody = n.body
-        , newSubject = n.subject
-        , tagString = ""
-        , counter = model.counter + 1
-    }
-
-
-editNote : Model -> Model
-editNote model =
-    case model.maybeCurrentNote of
-        Nothing ->
-            model
-
-        Just note ->
-            { model
-                | appMode = UserNotes EditingNote
-                , noteBody = note.body
-                , changedSubject = note.subject
-                , tagString = String.join ", " note.tags
-            }
-
-
-newNote : Model -> Maybe Note
-newNote model =
-    case model.currentUser of
-        Just user ->
-            let
-                now =
-                    model.currentTime
-            in
-            Just <|
-                { id = "---"
-                , subject = "New Note"
-                , body = ""
-                , tags = Note.tagsFromString model.tagString
-                , timeCreated = now
-                , timeModified = now
-                , selected = True
-                }
-
-        _ ->
-            Nothing
-
-
-selectNotes model =
-    Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
-        |> Note.applySubjectFilter model.noteFilterString
-        |> Note.applyBodyFilter model.textFilterString
-        |> Note.applyTagFilter model.tagFilterString
-
-
-
+--
+-- createNote : Model -> ( Model, Cmd FrontendMsg )
+-- createNote model =
+--     case newNote model of
+--         Nothing ->
+--             ( model, Cmd.none )
+--
+--         Just note ->
+--             ( { model
+--                 | maybeCurrentNote = Just note
+--                 , changedSubject = note.subject
+--                 , noteBody = note.body
+--                 , appMode = UserNotes EditingNote
+--                 , counter = model.counter + 1
+--               }
+--             , sendToBackend (CreateNote model.currentUser note)
+--             )
+--
+--
+-- makeNewNote : Model -> Model
+-- makeNewNote model =
+--     let
+--         n =
+--             Note.make "dkjfldsjfldjf-dfjldf" "New Note" "XXX" model.currentTime
+--     in
+--     { model
+--         | appMode = UserNotes CreatingNote
+--         , maybeCurrentNote = Just n
+--         , noteBody = n.body
+--         , newSubject = n.subject
+--         , tagString = ""
+--         , counter = model.counter + 1
+--     }
+--
+--
+-- editNote : Model -> Model
+-- editNote model =
+--     case model.maybeCurrentNote of
+--         Nothing ->
+--             model
+--
+--         Just note ->
+--             { model
+--                 | appMode = UserNotes EditingNote
+--                 , noteBody = note.body
+--                 , changedSubject = note.subject
+--                 , tagString = String.join ", " note.tags
+--             }
+--
+--
+-- newNote : Model -> Maybe Note
+-- newNote model =
+--     case model.currentUser of
+--         Just user ->
+--             let
+--                 now =
+--                     model.currentTime
+--             in
+--             Just <|
+--                 { id = "---"
+--                 , subject = "New Note"
+--                 , body = ""
+--                 , tags = Note.tagsFromString model.tagString
+--                 , timeCreated = now
+--                 , timeModified = now
+--                 , selected = True
+--                 }
+--
+--         _ ->
+--             Nothing
+--
+--
+-- selectNotes model =
+--     Note.bigDateFilter model.currentTime model.noteCameBeforeString model.noteCameAfterString model.notes
+--         |> Note.applySubjectFilter model.noteFilterString
+--         |> Note.applyBodyFilter model.textFilterString
+--         |> Note.applyTagFilter model.tagFilterString
+--
+--
+--
 
 
 --
