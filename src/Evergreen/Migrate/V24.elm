@@ -3,6 +3,8 @@ module Evergreen.Migrate.V24 exposing (..)
 import Evergreen.V1.Types as Old
 import Evergreen.V24.Types as New
 import Lamdera.Migrations exposing (..)
+import Debounce
+
 
 
 frontendModel : Old.FrontendModel -> ModelMigration New.FrontendModel New.FrontendMsg
