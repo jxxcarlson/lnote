@@ -1,7 +1,8 @@
-module View.Utility exposing(showIf, hideIf, showOne)
+module View.Utility exposing (hideIf, showIf, showOne)
 
-import Element exposing(Element)
-import Types exposing(FrontendMsg(..))
+import Element exposing (Element)
+import Types exposing (FrontendMsg(..))
+
 
 showIf : Bool -> Element FrontendMsg -> Element FrontendMsg
 showIf bit element =

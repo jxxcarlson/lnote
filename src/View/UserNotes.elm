@@ -1,29 +1,30 @@
-module View.UserNotes exposing(view)
+module View.UserNotes exposing (view)
 
-
+import Config exposing (config)
+import DateTime
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
-import Types exposing(DeleteNoteSafety(..), NotesMode(..), FrontendModel, FrontendMsg(..), ValidationState(..), AppMode(..))
-import Style
-import View.Utility exposing(showIf)
-import Config exposing(config)
-import User exposing(User)
-import Note exposing(Note)
-import DateTime
 import FrequencyDict
-import Time exposing(Posix)
-import Text
-import Html exposing(Html)
+import Html exposing (Html)
 import Html.Attributes as HA
 import Markdown
+import Note exposing (Note)
+import Style
+import Text
+import Time exposing (Posix)
+import Types exposing (AppMode(..), DeleteNoteSafety(..), FrontendModel, FrontendMsg(..), NotesMode(..), ValidationState(..))
+import User exposing (User)
 import View.Button
+import View.Utility exposing (showIf)
 
 
-type alias Model = FrontendModel
+type alias Model =
+    FrontendModel
+
 
 view : Model -> Element FrontendMsg
 view model =
@@ -307,9 +308,9 @@ submitNoteButton =
         , label = Element.text "New: minutes or hh:mm"
         }
 
+
+
 -- STUFF
-
-
 --
 -- FILTERS
 --
@@ -408,7 +409,6 @@ inputNoteCameAfterFilter model =
 
 
 
-
 -- MANUAL
 
 
@@ -427,6 +427,7 @@ viewText str =
 manual : Element FrontendMsg
 manual =
     viewText Text.manual
+
 
 
 --
@@ -456,14 +457,13 @@ markdownStyle =
     ]
 
 
--- Utility
 
+-- Utility
 
 
 pxString : Float -> String
 pxString f =
     String.fromFloat f ++ "px"
-
 
 
 toMarkdown : String -> Html FrontendMsg

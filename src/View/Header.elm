@@ -1,28 +1,29 @@
+module View.Header exposing (view)
 
-module View.Header exposing(view)
-
+import Config exposing (config)
+import DateTime
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
-import Types exposing(DeleteNoteSafety(..), NotesMode(..), FrontendModel, FrontendMsg(..), ValidationState(..), AppMode(..))
-import Style
-import View.Utility exposing(showIf)
-import Config exposing(config)
-import User exposing(User)
-import Note exposing(Note)
-import DateTime
 import FrequencyDict
-import Time exposing(Posix)
+import Html exposing (Html)
+import Note exposing (Note)
+import Style
 import Text
-import Html exposing(Html)
-import View.Button
-import View.Utility
+import Time exposing (Posix)
+import Types exposing (AppMode(..), DeleteNoteSafety(..), FrontendModel, FrontendMsg(..), NotesMode(..), ValidationState(..))
+import User exposing (User)
 import Utility
+import View.Button
+import View.Utility exposing (showIf)
 
-type alias Model = FrontendModel
+
+type alias Model =
+    FrontendModel
+
 
 view : Model -> Element FrontendMsg
 view model =
@@ -37,9 +38,6 @@ view model =
         , View.Button.setNoteMode BrowsingNotes "Notes" model
         , el [ centerX, Font.size 18, Font.color Style.white ] (text <| appTitle model)
         ]
-
-
-
 
 
 appTitle : Model -> String

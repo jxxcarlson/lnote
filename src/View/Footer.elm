@@ -1,25 +1,23 @@
-module View.Footer exposing(view)
+module View.Footer exposing (view)
 
-
+import Config exposing (config)
+import DateTime
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
-import Types exposing(DeleteNoteSafety(..), NotesMode(..), FrontendModel, FrontendMsg(..), ValidationState(..), AppMode(..))
-import Style
-import View.Utility exposing(showIf)
-import Config exposing(config)
-import User exposing(User)
-import Note exposing(Note)
-import DateTime
 import FrequencyDict
-import Time exposing(Posix)
+import Html exposing (Html)
+import Note exposing (Note)
+import Style
 import Text
-import Html exposing(Html)
+import Time exposing (Posix)
+import Types exposing (AppMode(..), DeleteNoteSafety(..), FrontendModel, FrontendMsg(..), NotesMode(..), ValidationState(..))
+import User exposing (User)
 import View.Button
-import View.Utility
+import View.Utility exposing (showIf)
 
 
 

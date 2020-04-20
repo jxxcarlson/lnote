@@ -1,5 +1,4 @@
-module View.Button exposing(deleteNote, userValidationMode, adminMode, setNoteMode, toggleManual, download)
-
+module View.Button exposing (adminMode,   randomNotes, deleteNote, download, setNoteMode, toggleManual, userValidationMode)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -7,11 +6,20 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
-import Types exposing(DeleteNoteSafety(..), NotesMode(..), FrontendModel, FrontendMsg(..), ValidationState(..), AppMode(..))
 import Style
+import Types exposing (AppMode(..), DeleteNoteSafety(..), FrontendModel,
+ FrontendMsg(..), NotesMode(..), ValidationState(..))
 
 
-type alias Model = FrontendModel
+type alias Model =
+    FrontendModel
+
+randomNotes =
+    Input.button
+        Style.headerButton
+        { onPress = Just GetRandomNotes
+        , label = Element.text "Random"
+        }
 
 deleteNote : Model -> Element FrontendMsg
 deleteNote model =
@@ -27,7 +35,6 @@ deleteNote model =
                 { onPress = Just DeleteCurrentNote
                 , label = Element.text "Delete forever?"
                 }
-
 
 
 toggleManual : Model -> Element FrontendMsg
@@ -62,7 +69,7 @@ userValidationMode model =
         }
 
 
-adminMode: Model -> Element FrontendMsg
+adminMode : Model -> Element FrontendMsg
 adminMode model =
     Input.button ((Style.select <| model.appMode == Admin) Style.selectedHeaderButton Style.headerButton)
         { onPress = Just (SetAppMode Admin)

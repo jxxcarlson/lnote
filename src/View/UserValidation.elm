@@ -1,19 +1,21 @@
-module View.UserValidation exposing(view)
+module View.UserValidation exposing (view)
 
-
+import Config exposing (config)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
-import Types exposing(FrontendModel, FrontendMsg(..), ValidationState(..), AppMode(..))
 import Style
-import View.Utility exposing(showIf)
-import Config exposing(config)
-import User exposing(User)
+import Types exposing (AppMode(..), FrontendModel, FrontendMsg(..), ValidationState(..))
+import User exposing (User)
+import View.Utility exposing (showIf)
 
-type alias Model = FrontendModel
+
+type alias Model =
+    FrontendModel
+
 
 view : Model -> Element FrontendMsg
 view model =
@@ -64,7 +66,6 @@ adminStatus model =
 
                 True ->
                     el [ Font.size 12 ] (text "Admin")
-
 
 
 pxFloat =
@@ -165,8 +166,6 @@ changePasswordButton model =
         }
 
 
-
-
 inputUserName model =
     Input.text (Style.inputStyle 200)
         { onChange = GotUserName
@@ -253,6 +252,7 @@ signOutButton model =
         { onPress = Just SignOut
         , label = Element.text "Sign out"
         }
+
 
 
 -- Utility

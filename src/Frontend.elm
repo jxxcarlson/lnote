@@ -43,7 +43,9 @@ import View.UserValidation
 import View.UserNotes
 import View.Footer
 import View.Header
+import View.Admin
 import Config exposing(config, Config)
+import KeyCommands
 
 
 app =
@@ -62,28 +64,8 @@ app =
         }
 
 
-
---
--- Types
---
---
--- MODEL
---
-
-
 type alias Model =
     FrontendModel
-
-
-
---
--- INIT
---
---
--- CONFIG
---
-
-
 
 
 initialModel : Model
@@ -723,26 +705,9 @@ mainView model =
                 View.UserNotes.view model
 
             Admin ->
-                adminView model
+                View.Admin.view model
         , View.Footer.view model
         ]
-
-
-
---
--- USER VIEW
---
-
-randomNotesButton =
-    Input.button
-        Style.headerButton
-        { onPress = Just GetRandomNotes
-        , label = Element.text "Random"
-        }
-
-
-
-
 
 --
 -- UPDATE HELPERS
@@ -835,109 +800,6 @@ selectNotes model =
 
 
 
---
--- KEY COMMANDS
---
-
-
-sortIncreasingAlphabeticallyUsingKey : List Key -> Model -> Model
-sortIncreasingAlphabeticallyUsingKey pressedKeys model =
-    if List.member (Character "A") pressedKeys then
-        { model | notes = Note.sortAlphabetically Note.SortIncreasing model.notes }
-
-    else
-        model
-
-
-sortDecreasingAlphabeticallyUsingKey : List Key -> Model -> Model
-sortDecreasingAlphabeticallyUsingKey pressedKeys model =
-    if List.member (Character "B") pressedKeys then
-        { model | notes = Note.sortAlphabetically Note.SortDecreasing model.notes }
-
-    else
-        model
-
-
-sortDecreasingByDateUsingKey : List Key -> Model -> Model
-sortDecreasingByDateUsingKey pressedKeys model =
-    if List.member (Character "D") pressedKeys then
-        { model | notes = Note.sortByTimeModified Note.SortDecreasing model.notes }
-
-    else
-        model
-
-
-sortIncreasingByDateUsingKey : List Key -> Model -> Model
-sortIncreasingByDateUsingKey pressedKeys model =
-    if List.member (Character "I") pressedKeys then
-        { model | notes = Note.sortByTimeModified Note.SortIncreasing model.notes }
-
-    else
-        model
-
-
-unsortedUsingKey : List Key -> Model -> Model
-unsortedUsingKey pressedKeys model =
-    if List.member (Character "U") pressedKeys then
-        { model | notes = Note.selectAll model.notes }
-
-    else
-        model
-
-
-setBrowsingModeUsingKey : List Key -> Model -> Model
-setBrowsingModeUsingKey pressedKeys model =
-    if List.member (Character "B") pressedKeys then
-        { model | appMode = UserNotes BrowsingNotes, maybeCurrentNote = Note.firstSelectedNote model.notes }
-
-    else
-        model
-
-
-toggleManualUsingKey : List Key -> Model -> Model
-toggleManualUsingKey pressedKeys model =
-    if List.member (Character "M") pressedKeys then
-        { model | manualVisible = manualVisibleForKey pressedKeys model }
-
-    else
-        model
-
-
-editNoteUsingKey : List Key -> Model -> Model
-editNoteUsingKey pressedKeys model =
-    if List.member (Character "E") pressedKeys then
-        editNote model
-
-    else
-        model
-
-
-makeNewNoteUsingKey : List Key -> Model -> Model
-makeNewNoteUsingKey pressedKeys model =
-    if List.member (Character "N") pressedKeys then
-        makeNewNote model
-
-    else
-        model
-
-
-appModeOfKey : AppMode -> List Key -> AppMode
-appModeOfKey currentAppMode pressedKeys =
-    if List.member (Character "B") pressedKeys then
-        UserNotes BrowsingNotes
-
-    else
-        currentAppMode
-
-
-manualVisibleForKey : List Key -> Model -> Bool
-manualVisibleForKey pressedKeys model =
-    if List.member (Character "M") pressedKeys then
-        not model.manualVisible
-
-    else
-        model.manualVisible
-
 
 
 --
@@ -974,49 +836,6 @@ showOne bit str1 str2 =
 
 
 
---
--- ADMIN VIEW
---
-
-
-adminView : Model -> Element FrontendMsg
-adminView model =
-    case model.currentUser of
-        Nothing ->
-            Element.none
-
-        Just user ->
-            case user.admin of
-                False ->
-                    Element.none
-
-                True ->
-                    adminView_ model user
-
-
-adminView_ : Model -> User -> Element FrontendMsg
-adminView_ model user =
-    column Style.mainColumnX
-        [ el [ Font.size 14 ] (text <| "Admin: " ++ user.username)
-        , indexedTable
-            [ spacing 4, Font.size 12, paddingXY 0 12, height (px 300), scrollbarY ]
-            { data = model.userList
-            , columns =
-                [ { header = el [ Font.bold ] (text "k")
-                  , width = px 40
-                  , view = \k usr -> el [ Font.size 12 ] (text <| String.fromInt <| k + 1)
-                  }
-                , { header = el [ Font.bold ] (text "Username")
-                  , width = px 130
-                  , view = \k usr -> el [ Font.size 12 ] (text usr.username)
-                  }
-                , { header = el [ Font.bold ] (text "Email")
-                  , width = px 200
-                  , view = \k usr -> el [ Font.size 12 ] (text usr.email)
-                  }
-                ]
-            }
-        ]
 
 
 
