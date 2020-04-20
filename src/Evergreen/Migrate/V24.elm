@@ -1,7 +1,7 @@
 module Evergreen.Migrate.V24 exposing (..)
 
-import Evergreen.V1.Types as Old exposing(DeleteNoteSafety(..), AppMode(..), ValidationState(..))
-import Evergreen.V24.Types as New
+import Evergreen.V1.Types as Old
+import Evergreen.V24.Types as New exposing(DeleteNoteSafety(..), AppMode(..), ValidationState(..))
 import Lamdera.Migrations exposing (..)
 import Debounce
 import Dict
