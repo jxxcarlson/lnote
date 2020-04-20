@@ -458,9 +458,6 @@ tagButtonList model =
 
 tagButton : String -> ( String, Int ) ->  Element FrontendMsg
 tagButton selectedTag ( tag, freq ) =
-    let
-        _ = Debug.log "(tag, selectedTag)" (tag, selectedTag)
-    in
     Input.button (Style.titleButton ( tag ==  selectedTag) ++ [ paddingXY 4 0 ])
         { onPress = Just (SetTagForSearch tag)
         , label = text (tag ++ ": " ++ String.fromInt freq)
