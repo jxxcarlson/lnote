@@ -4,7 +4,8 @@ import Evergreen.V1.Types as Old
 import Evergreen.V24.Types as New
 import Lamdera.Migrations exposing (..)
 import Debounce
-
+import Dict
+import Time 
 
 
 frontendModel : Old.FrontendModel -> ModelMigration New.FrontendModel New.FrontendMsg
