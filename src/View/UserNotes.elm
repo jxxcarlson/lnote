@@ -19,7 +19,7 @@ import Time exposing (Posix)
 import Types exposing (AppMode(..), DeleteNoteSafety(..), FrontendModel, FrontendMsg(..), NotesMode(..), ValidationState(..))
 import User exposing (User)
 import View.Button
-import View.Utility exposing (showIf)
+import View.Utility exposing (showIf, hideIf  )
 
 
 type alias Model =
@@ -36,6 +36,7 @@ view model =
             , showIf (model.appMode == UserNotes EditingNote) (editNotePanel model)
             , viewNote model.maybeCurrentNote
             , showIf model.manualVisible manual
+            , hideIf model.manualVisible (tagsView model)
             ]
         ]
 
@@ -195,12 +196,6 @@ viewNotes model =
                   }
                 ]
             }
-        , column [ spacing 8 ]
-            [ row [ spacing 24, alignBottom, alignLeft ]
-                [ el [ Font.size 14, Font.bold ] (text <| "Count: " ++ String.fromInt (List.length (List.filter (\note -> note.selected) model.notes)))
-                ]
-            , tagButtons model
-            ]
         ]
 
 
@@ -428,9 +423,42 @@ manual : Element FrontendMsg
 manual =
     viewText Text.manual
 
+tagsView : Model -> Element FrontendMsg
+tagsView model =
+  column
+      [ width (pxFloat config.panelWidth)
+      , height (pxFloat config.panelHeight)
+      , padding 20
+      , spacing 6
+      , Font.size 14
+      , scrollbarY
+      , Border.width 1
+      ]
+      ((tagHeader model)::(tagButtonList model))
+
+tagHeader model =
+  row [spacing 12, paddingEach {nullPadding | bottom = 8}] [
+    el [Font.bold] (text ("Tags: " ++ String.fromInt (tagCount model)))
+    -- , clearTagSearch
+    ]
+
+nullPadding = {left = 0, right = 0, top = 0, bottom = 0}
+
+tagCount : Model -> Int
+tagCount model =
+  model.frequencyDict
+      |> FrequencyDict.list
+      |> List.length
 
 
---
+tagButtonList : Model -> List (Element FrontendMsg)
+tagButtonList model =
+    model.frequencyDict
+        |> FrequencyDict.list
+        |> List.map (\item -> tagButton item)
+
+
+
 -- MARKDOWN
 --
 

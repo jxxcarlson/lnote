@@ -162,7 +162,9 @@ updateFromBackend msg model =
                     ( { model | currentUser = Nothing, message = "Incorrect password/username" }, Cmd.none )
 
                 Just user ->
-                    ( { model | currentUser = Just user, appMode = UserNotes BrowsingNotes }
+                    ( { model | currentUser = Just user
+                      , message = "Signed in as " ++ user.username
+                      , appMode = UserNotes BrowsingNotes }
                     , sendToBackend (RequestNotes (Just user))
                     )
 
@@ -695,7 +697,7 @@ view model =
 
 mainView : Model -> Element FrontendMsg
 mainView model =
-    column [ height fill ]
+    column [ height fill, width fill ]
         [ Html.node "link" [ HA.rel "stylesheet", HA.href "mystyle.css" ] [] |> Element.html
         , View.Header.view model
         , case model.appMode of
@@ -730,10 +732,6 @@ type alias UpdateNoteRecord =
 downloadNotes : List Note -> Cmd FrontendMsg
 downloadNotes noteList =
     Download.string "notes.yaml" "text/yaml" (Note.listToYaml noteList)
-
-
-
-
 
 pxString : Float -> String
 pxString f =
