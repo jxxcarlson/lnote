@@ -20,6 +20,8 @@ import Types exposing (AppMode(..), DeleteNoteSafety(..), FrontendModel, Fronten
 import User exposing (User)
 import View.Button
 import View.Utility exposing (showIf, hideIf  )
+import Widget.TextField as TextField
+import Widget.TextArea as TextArea
 
 
 type alias Model =
@@ -71,14 +73,12 @@ editNotePanel model =
         ]
 
 
-inputNoteBody model =
-    Input.multiline (Style.multiline 400 (round (config.panelHeight - 85)))
-        { onChange = GotNoteBody
-        , text = model.noteBody
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        , spellcheck = False
-        }
+inputNoteBody model  =
+    TextArea.input GotNoteBody model.noteBody "Enter text"
+        |> TextArea.withWidth (round config.panelWidth)
+        |> TextArea.withHeight (round (config.panelHeight - 105))
+        |> TextArea.toElement
+
 
 
 deleteNoteControls model =
@@ -119,37 +119,26 @@ cancelDeleteNoteButton =
 
 
 inputNewNoteName model =
-    Input.text (Style.inputStyle 285)
-        { onChange = GotNewNoteName
-        , text = model.newSubject
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
+  TextField.make GotNewNoteName model.newSubject ""
+      |> TextField.withHeight 30
+      |> TextField.withWidth 365
+      |> TextField.withLabelWidth 40
+      |> TextField.toElement
 
 
 inputNoteTags model =
-    Input.text (Style.inputStyle 365)
-        { onChange = GotTagString
-        , text = model.tagString
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "Tags: ")
-        }
-
+    TextField.make GotTagString model.tagString "Tags"
+        |> TextField.withHeight 30
+        |> TextField.withWidth 365
+        |> TextField.withLabelWidth 40
+        |> TextField.toElement
 
 inputChangedSubject model =
-    Input.text (Style.inputStyle 315)
-        { onChange = GotChangedSubject
-        , text = model.changedSubject
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
-
-
-
---
---
--- VIEWLOGS
---
+      TextField.make GotChangedSubject model.changedSubject ""
+          |> TextField.withHeight 30
+          |> TextField.withWidth 325
+          |> TextField.withLabelWidth 0
+          |> TextField.toElement
 
 
 noteListPanel : Model -> Element FrontendMsg
@@ -241,18 +230,6 @@ viewNote maybeNote =
                 [ toMarkdown content |> Element.html
                 ]
 
---
--- tagButtons : Model -> Element FrontendMsg
--- tagButtons model =
---     model.frequencyDict
---         |> FrequencyDict.list
---         |> List.map (\item -> tagButton item)
---         |> List.take 20
---         |> (\x -> el [ Font.size 12 ] (text "Tags:") :: x)
---         |> (\x -> x ++ [ clearTagSearch ])
---         |> (\x -> Element.paragraph [ spacing 8, Font.size 14, width (pxFloat (2 * config.panelWidth - 60)) ] x)
-
-
 
 
 clearTagSearch : Element FrontendMsg
@@ -304,25 +281,23 @@ submitNoteButton =
 
 
 
--- STUFF
---
 -- FILTERS
---
+
 
 
 filterPanel model =
     row [ spacing 12 ]
         [ el [ Font.bold ] (text "Filter by")
         , row [ spacing 8 ]
-            [ el [ Font.bold ] (text "subject:")
+            [ el [ Font.bold ] (text "subject")
             , inputNoteNameFilter model
             ]
         , row [ spacing 8 ]
-            [ el [ Font.bold ] (text "text:")
+            [ el [ Font.bold ] (text "text")
             , inputTextFilter model
             ]
         , row [ spacing 8 ]
-            [ el [ Font.bold ] (text "tag:")
+            [ el [ Font.bold ] (text "tag")
             , inputTagFilter model
             ]
         , clearAllSearches
@@ -358,48 +333,46 @@ displayShiftedDate kDaysAgoString today =
 
 
 inputNoteNameFilter model =
-    Input.text (Style.inputStyle 160)
-        { onChange = GotNoteFilter
-        , text = model.noteFilterString
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
+    TextField.make GotNoteFilter model.noteFilterString ""
+        |> TextField.withHeight 30
+        |> TextField.withWidth 160
+        |> TextField.withLabelWidth 0
+        |> TextField.toElement
+
 
 
 inputTextFilter model =
-    Input.text (Style.inputStyle 160)
-        { onChange = GotTextFilter
-        , text = model.textFilterString
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
+      TextField.make GotNoteFilter model.textFilterString ""
+          |> TextField.withHeight 30
+          |> TextField.withWidth 160
+          |> TextField.withLabelWidth 0
+          |> TextField.toElement
+
 
 
 inputTagFilter model =
-    Input.text (Style.inputStyle 80)
-        { onChange = GotTagFilter
-        , text = model.tagFilterString
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
+    TextField.make GotNoteFilter model.tagFilterString ""
+        |> TextField.withHeight 30
+        |> TextField.withWidth 80
+        |> TextField.withLabelWidth 0
+        |> TextField.toElement
+
 
 
 inputNoteCameBeforeFilter model =
-    Input.text (Style.inputStyle 50)
-        { onChange = GotNoteDateBeforeFilter
-        , text = model.noteCameBeforeString
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
-
+      TextField.make GotNoteDateBeforeFilter model.noteCameBeforeString ""
+          |> TextField.withHeight 30
+          |> TextField.withWidth 50
+          |> TextField.withLabelWidth 0
+          |> TextField.toElement
 
 inputNoteCameAfterFilter model =
-    Input.text (Style.inputStyle 50)
-        { onChange = GotNoteDateAfterFilter
-        , text = model.noteCameAfterString
-        , placeholder = Nothing
-        , label = Input.labelLeft [ Font.size 14, moveDown 8 ] (text "")
-        }
+        TextField.make GotNoteDateAfterFilter model.noteCameAfterString ""
+            |> TextField.withHeight 30
+            |> TextField.withWidth 50
+            |> TextField.withLabelWidth 0
+            |> TextField.toElement
+
 
 
 
