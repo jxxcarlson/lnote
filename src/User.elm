@@ -72,19 +72,12 @@ encrypt str =
 
 validatePassword : String -> String -> Bool
 validatePassword password encryptedPassword =
-    encrypt password == encryptedPassword 
+    encrypt password == encryptedPassword
 
 
 
 validateUser : PasswordDict -> Username -> String -> Bool
 validateUser passwordDict username passWord =
-    -- let
-    --   _ = Debug.log "(username, passWord)" (username, passWord)
-    --
-    --   _ = Debug.log "passwordDict" passwordDict
-    --
-    --   _ = Debug.log "foo" "bar"
-    -- in
     case Dict.get username passwordDict of
         Nothing ->
             False
