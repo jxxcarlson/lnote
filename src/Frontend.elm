@@ -20,6 +20,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import File.Download as Download
+import File.Select as Select
 import FrequencyDict exposing (FrequencyDict)
 import Graph exposing (Option(..))
 import Html exposing (Html, time)
@@ -174,6 +175,22 @@ updateFromBackend msg model =
 
         SendFrequencyDict fD ->
             ( { model | frequencyDict = fD }, Cmd.none )
+
+        NoteArchiveRequested ->
+            ( model, requestNoteArchive)
+
+        NoteArchiveLoaded data ->
+          case Codec.decodeNoteList of
+            Error -> { model | message = "Error decoding note list archive"}, Cmd.none}
+            Ok noteList ->
+              let
+                _ = Debug.log "Note Archive" noteList
+              in
+                { model | message = "Note list archive decoded"}, Cmd.none}
+
+requestNoteArchive : Cmd FrontendMsg
+requestNoteArchive =
+  Select.file ["application/json"] NoteArchiveLoaded
 
 
 bodyDebounceConfig : Debounce.Config FrontendMsg

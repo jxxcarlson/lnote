@@ -49,6 +49,7 @@ activeFooter model =
         , makeNewNoteButton model
         , row [ paddingXY 24 0 ] [ showIf (model.maybeCurrentNote /= Nothing) (View.Button.deleteNote model) ]
         , View.Utility.hideIf (model.currentUser == Nothing) View.Button.download
+        , View.Utility.hideIf (model.currentUser == Nothing) View.Button.upload
         , View.Button.toggleManual model
         , el [ Font.color Style.white, Font.size 12 ] (text model.message)
         ]

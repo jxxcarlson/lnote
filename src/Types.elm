@@ -26,6 +26,7 @@ import UUID exposing (UUID)
 import Url exposing (Url)
 import User exposing (PasswordDict, User, UserDict)
 import UserData
+import File exposing(File)
 
 
 type alias BackendModel =
@@ -157,6 +158,8 @@ type FrontendMsg
     | GetRandomNotes
     | SelectRandomNotes (List Int)
     | SetDeleteNoteSafety DeleteNoteSafety
+    | NoteArchiveRequested
+    | NoteArchiveLoaded File
 
 
 type AppMode

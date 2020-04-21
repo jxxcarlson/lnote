@@ -1,4 +1,4 @@
-module Codec exposing(encodeNoteListAsString, noteListDecoder)
+module Codec exposing(encodeNoteListAsString, decodeNoteList)
 
 import Json.Encode as E
 import Json.Decode as D
@@ -42,6 +42,10 @@ toUtcString time =
 
 {-| DECODERS -}
 
+
+decodeNoteList : String -> Result D.Error (List Note)
+decodeNoteList data =
+  D.decodeString noteListDecoder data
 
 noteListDecoder : D.Decoder (List Note)
 noteListDecoder =

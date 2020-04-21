@@ -60,6 +60,14 @@ download =
         , label = el [] (text "Download")
         }
 
+upload : Element FrontendMsg
+upload =
+    Input.button Style.headerButton
+        { onPress = Just NoteArchiveRequested
+        , label = el [] (text "Upload")
+        }
+
+
 
 userValidationMode : Model -> Element FrontendMsg
 userValidationMode model =
