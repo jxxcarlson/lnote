@@ -1,9 +1,12 @@
-module Codec exposing(encodeNoteListAsString)
+module Codec exposing(encodeNoteListAsString, noteListDecoder)
 
 import Json.Encode as E
 import Json.Decode as D
 import Time exposing (utc, toHour, toMinute, toSecond)
 import Note exposing(Note)
+
+
+{- ENCODERS -}
 
 encodeNoteListAsString : List Note -> String
 encodeNoteListAsString noteList =
@@ -21,8 +24,8 @@ encodeNote note =
     ,("subject", E.string note.subject)
     , ("body", E.string note.body)
     , ("tags", E.list  E.string note.tags)
-    , ("timeCreated", E.string (toUtcString note.timeCreated))
-    , ("timeModified", E.string (toUtcString note.timeModified))
+    , ("timeCreated", E.int (Time.posixToMillis note.timeCreated))
+    , ("timeModified", E.int (Time.posixToMillis note.timeModified))
     , ("selected", E.bool note.selected)
   ]
 
@@ -36,3 +39,21 @@ toUtcString time =
   ++ ":" ++
   String.fromInt (toSecond utc time)
   ++ " (UTC)"
+
+{-| DECODERS -}
+
+
+noteListDecoder : D.Decoder (List Note)
+noteListDecoder =
+  D.list noteDecoder
+
+noteDecoder : D.Decoder Note
+noteDecoder =
+  D.map7 Note
+    (D.field "id" D.string)
+    (D.field "subject" D.string)
+    (D.field "tags" (D.list D.string))
+    (D.field "body" D.string)
+    (D.field "timeCreated" (D.int |> D.map Time.millisToPosix))
+    (D.field "timeModified" (D.int |> D.map Time.millisToPosix))
+    (D.field "selected" (D.bool ))
