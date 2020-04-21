@@ -113,7 +113,7 @@ updateFromFrontend sessionId clientId msg model =
                         passwordUpdater =
                             Maybe.map (\ep -> User.encrypt newPassword)
 
-                        newPasswordDict = Debug.log "newPasswordDict" <|
+                        newPasswordDict = 
                             Dict.update username passwordUpdater model.passwordDict
                     in
                     ( { model | passwordDict = newPasswordDict }, sendToFrontend clientId <| SendMessage <| "Password changed" )
