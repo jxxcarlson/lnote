@@ -342,7 +342,7 @@ inputNoteNameFilter model =
 
 
 inputTextFilter model =
-      TextField.make GotNoteFilter model.textFilterString ""
+      TextField.make GotTextFilter model.textFilterString ""
           |> TextField.withHeight 30
           |> TextField.withWidth 160
           |> TextField.withLabelWidth 0
@@ -351,7 +351,7 @@ inputTextFilter model =
 
 
 inputTagFilter model =
-    TextField.make GotNoteFilter model.tagFilterString ""
+    TextField.make GotTagFilter model.tagFilterString ""
         |> TextField.withHeight 30
         |> TextField.withWidth 80
         |> TextField.withLabelWidth 0
