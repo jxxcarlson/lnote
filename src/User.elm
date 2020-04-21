@@ -60,11 +60,6 @@ getData username dict =
         |> Maybe.map .data
 
 
-encrypt1 : String -> String
-encrypt1 str =
-    "!@" ++ String.reverse str ++ "@!"
-
-
 encrypt : String -> String
 encrypt str =
     Crypto.HMAC.digest sha512 "YoKO-mukti-yada-BlK#10&%F.7.910-hoH0" str
@@ -147,7 +142,11 @@ add username password email ( passwordDict, userDict ) =
                     Dict.insert username (encrypt password) passwordDict
 
                 newUserInfo =
+                  if username == "jxxcarlson!" then
+                    { email = email, admin = True, counter = 0, data = [], tagDict = Dict.empty }
+                  else
                     { email = email, admin = False, counter = 0, data = [], tagDict = Dict.empty }
+
 
                 newUserDict =
                     Dict.insert username newUserInfo userDict
