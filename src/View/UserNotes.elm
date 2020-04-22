@@ -22,6 +22,7 @@ import View.Button
 import View.Utility exposing (showIf, hideIf  )
 import Widget.TextField as TextField
 import Widget.TextArea as TextArea
+import Widget.Button as Button exposing(Size(..))
 
 
 type alias Model =
@@ -242,10 +243,10 @@ clearTagSearch =
 
 clearAllSearches : Element FrontendMsg
 clearAllSearches =
-    Input.button Style.smallButton
-        { onPress = Just ClearAllSearches
-        , label = text "Clear searches"
-        }
+    Button.make  ClearAllSearches "Clear searches"
+            |> Button.withWidth (Bounded 120)
+            |> Button.toElement
+
 
 
 selectNoteButton : Maybe Note -> Note -> Element FrontendMsg
