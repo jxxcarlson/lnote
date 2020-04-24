@@ -44,7 +44,7 @@ noUserLHS model =
         [ el [ Font.size 18, Font.bold, paddingEach {nullPadding | bottom = 12}] (text "Welcome to Lamdera Notes")
         , inputUserName model
         , inputPassword model
-        , showIf (model.appMode == UserValidation SignUpState) (inputEmail model)
+        , showIf (model.appMode == UserValidation SignUpState) (inputNewPassword2 model)
       --  , showIf (model.appMode == UserValidation SignUpState) (el [ Font.size 12 ] (text "Email address optional"))
         , row [ spacing 12, paddingXY 0 12 ]
             [ showIf (model.appMode == UserValidation SignInState) (signInButton model)
@@ -132,7 +132,7 @@ passwordPanel model =
 
 inputCurrentPassword model =
     TextField.make GotPassword model.password "Old password"
-        |> TextField.withHeight 30
+        |> TextField.withHeight 40
         |> TextField.withWidth 200
         |> TextField.withLabelWidth 110
         |> TextField.withRole Password
@@ -143,7 +143,7 @@ inputCurrentPassword model =
 
 inputNewPassword1 model =
       TextField.make GotNewPassword1 model.newPassword1 "New password"
-          |> TextField.withHeight 30
+          |> TextField.withHeight 40
           |> TextField.withWidth 200
           |> TextField.withLabelWidth 110
           |> TextField.withRole Password
@@ -151,9 +151,9 @@ inputNewPassword1 model =
 
 inputNewPassword2 model =
         TextField.make GotNewPassword2 model.newPassword2 "Password again"
-            |> TextField.withHeight 30
+            |> TextField.withHeight 40
             |> TextField.withWidth 200
-            |> TextField.withLabelWidth 110
+            |> TextField.withLabelWidth 100
             |> TextField.withRole Password
             |> renderTextField
 

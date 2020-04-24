@@ -399,14 +399,14 @@ update msg model =
         SignUp ->
             let
                 signUpErrors =
-                    User.validateSignUpInfo model.username (User.encryptForTransmission model.password) model.email
+                    User.validateSignUpInfo model.username model.password model.newPassword2
             in
             case List.length signUpErrors > 0 of
                 True ->
                     ( { model | message = String.join ", " signUpErrors }, Cmd.none )
 
                 False ->
-                    ( initialModel, sendToBackend (SendSignUpInfo model.username model.password model.email) )
+                    ( initialModel, sendToBackend (SendSignUpInfo model.username (User.encryptForTransmission model.password) model.email) )
 
         SignOut ->
             ( initialModel, Cmd.none )

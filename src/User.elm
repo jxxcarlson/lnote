@@ -88,11 +88,11 @@ validateUser passwordDict username passWord =
 
 
 validateSignUpInfo : Username -> String -> String -> List String
-validateSignUpInfo username password email =
+validateSignUpInfo username password passwordAgain =
     []
         |> userNameLongEnough username
         |> passwordLongEnough password
-        |> emailValid email
+        |> passwordsMatch password passwordAgain
 
 
 validateChangePassword : String -> String -> List String
