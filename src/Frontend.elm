@@ -381,8 +381,10 @@ update msg model =
 
                         Just user ->
                             ( { model | message = "OK" }
-                            , sendToBackend (SendChangePasswordInfo user.username model.password model.newPassword1)
-                            )
+                            , sendToBackend (SendChangePasswordInfo user.username
+                              (User.encryptForTransmission model.password)
+                              (User.encryptForTransmission model.newPassword1)
+                            ))
 
                 errorList ->
                     ( { model | message = String.join ", " errorList }, Cmd.none )
@@ -391,15 +393,13 @@ update msg model =
             ( { model | email = str }, Cmd.none )
 
         SignIn ->
-          -- let
-          --   _ = Debug.log "SignIn" (model.username, model.password)
-          -- in
-            ( initialModel, sendToBackend (SendSignInInfo model.username model.password) )
+
+            ( initialModel, sendToBackend (SendSignInInfo model.username (User.encryptForTransmission model.password)) )
 
         SignUp ->
             let
                 signUpErrors =
-                    User.validateSignUpInfo model.username model.password model.email
+                    User.validateSignUpInfo model.username (User.encryptForTransmission model.password) model.email
             in
             case List.length signUpErrors > 0 of
                 True ->
@@ -693,10 +693,8 @@ update msg model =
 
 
 
--- sendToBackend (SendSignInInfo model.username model.password) )
---
+
 -- VIEW
---
 
 
 view : Model -> Html FrontendMsg

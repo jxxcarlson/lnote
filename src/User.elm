@@ -9,6 +9,7 @@ module User exposing
     , deleteUser
     , encrypt
     , fromDict
+    , encryptForTransmission
     , getData
     , validateChangePassword
     , validateSignUpInfo
@@ -63,6 +64,11 @@ getData username dict =
 encrypt : String -> String
 encrypt str =
     Crypto.HMAC.digest sha512 "YoKO-mukti-yada-BlK#10&%F.7.910-hoH0" str
+
+encryptForTransmission : String -> String
+encryptForTransmission str =
+    Crypto.HMAC.digest sha512 "blaLaLAka-&^1-HuM5_go*+!ETA-muKtOFo7918" str
+
 
 
 validatePassword : String -> String -> Bool
