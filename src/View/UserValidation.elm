@@ -12,7 +12,7 @@ import Types exposing (AppMode(..), FrontendModel, FrontendMsg(..), ValidationSt
 import User exposing (User)
 import View.Utility exposing (showIf, hideIf)
 import Widget.Button as Button exposing(Size(..))
-import Widget.TextField as TextField
+import Widget.TextField as TextField exposing(Role(..))
 
 
 type alias Model =
@@ -135,7 +135,8 @@ inputCurrentPassword model =
         |> TextField.withHeight 30
         |> TextField.withWidth 200
         |> TextField.withLabelWidth 110
-        |> TextField.toElement
+        |> TextField.withRole Password
+        |> renderTextField
 
 
 
@@ -145,14 +146,16 @@ inputNewPassword1 model =
           |> TextField.withHeight 30
           |> TextField.withWidth 200
           |> TextField.withLabelWidth 110
-          |> TextField.toElement
+          |> TextField.withRole Password
+          |> renderTextField
 
 inputNewPassword2 model =
         TextField.make GotNewPassword2 model.newPassword2 "Password again"
             |> TextField.withHeight 30
             |> TextField.withWidth 200
             |> TextField.withLabelWidth 110
-            |> TextField.toElement
+            |> TextField.withRole Password
+            |> renderTextField
 
 
 
@@ -160,28 +163,29 @@ inputNewPassword2 model =
 
 inputUserName model =
       TextField.make GotUserName model.username "Username"
-          |> TextField.withHeight 35
+          |> TextField.withHeight 40
           |> TextField.withWidth 200
           |> TextField.withLabelWidth 100
-          |> TextField.toElement
+          |> renderTextField
 
 
 
 inputEmail model =
         TextField.make GotEmail model.email "Email"
-            |> TextField.withHeight 35
+            |> TextField.withHeight 40
             |> TextField.withWidth 200
             |> TextField.withLabelWidth 100
-            |> TextField.toElement
+            |> renderTextField
 
 
 
 inputPassword model =
           TextField.make GotPassword model.password "Password"
-              |> TextField.withHeight 35
+              |> TextField.withHeight 40
               |> TextField.withWidth 200
               |> TextField.withLabelWidth 100
-              |> TextField.toElement
+              |> TextField.withRole Password
+              |> renderTextField
 
 
 
@@ -265,6 +269,10 @@ cancelChangePasswordButton model =
       |> Button.toElement
 
 
+renderTextField x =
+  x |> TextField.withBackgroundColor  Style.white
+  |> TextField.withFontColor  Style.black
+  |> TextField.toElement
 
 
 -- Utility

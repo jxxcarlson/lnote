@@ -75,7 +75,7 @@ editNotePanel model =
 
 
 inputNoteBody model  =
-    TextArea.input GotNoteBody model.noteBody "Enter text"
+    TextArea.make GotNoteBody model.noteBody "Enter text"
         |> TextArea.withWidth (round config.panelWidth)
         |> TextArea.withHeight (round (config.panelHeight - 105))
         |> TextArea.toElement
@@ -124,7 +124,7 @@ inputNewNoteName model =
       |> TextField.withHeight 30
       |> TextField.withWidth 365
       |> TextField.withLabelWidth 40
-      |> TextField.toElement
+      |> renderTextField
 
 
 inputNoteTags model =
@@ -132,14 +132,14 @@ inputNoteTags model =
         |> TextField.withHeight 30
         |> TextField.withWidth 365
         |> TextField.withLabelWidth 40
-        |> TextField.toElement
+        |> renderTextField
 
 inputChangedSubject model =
       TextField.make GotChangedSubject model.changedSubject ""
           |> TextField.withHeight 30
           |> TextField.withWidth 325
           |> TextField.withLabelWidth 0
-          |> TextField.toElement
+          |> renderTextField
 
 
 noteListPanel : Model -> Element FrontendMsg
@@ -337,8 +337,7 @@ inputNoteNameFilter model =
     TextField.make GotNoteFilter model.noteFilterString ""
         |> TextField.withHeight 30
         |> TextField.withWidth 160
-        |> TextField.withLabelWidth 0
-        |> TextField.toElement
+        |> renderTextField
 
 
 
@@ -346,8 +345,7 @@ inputTextFilter model =
       TextField.make GotTextFilter model.textFilterString ""
           |> TextField.withHeight 30
           |> TextField.withWidth 160
-          |> TextField.withLabelWidth 0
-          |> TextField.toElement
+          |> renderTextField
 
 
 
@@ -356,23 +354,28 @@ inputTagFilter model =
         |> TextField.withHeight 30
         |> TextField.withWidth 80
         |> TextField.withLabelWidth 0
-        |> TextField.toElement
+        |> renderTextField
 
+
+renderTextField x =
+  x |> TextField.withBackgroundColor  Style.white
+  |> TextField.withFontColor  Style.black
+  |> TextField.toElement
 
 
 inputNoteCameBeforeFilter model =
       TextField.make GotNoteDateBeforeFilter model.noteCameBeforeString ""
           |> TextField.withHeight 30
           |> TextField.withWidth 50
-          |> TextField.withLabelWidth 0
-          |> TextField.toElement
+          |> renderTextField
+
 
 inputNoteCameAfterFilter model =
         TextField.make GotNoteDateAfterFilter model.noteCameAfterString ""
             |> TextField.withHeight 30
             |> TextField.withWidth 50
             |> TextField.withLabelWidth 0
-            |> TextField.toElement
+            |> renderTextField
 
 
 
