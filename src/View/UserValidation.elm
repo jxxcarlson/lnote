@@ -45,7 +45,7 @@ noUserLHS model =
         , inputUserName model
         , inputPassword model
         , showIf (model.appMode == UserValidation SignUpState) (inputEmail model)
-        , showIf (model.appMode == UserValidation SignUpState) (el [ Font.size 12 ] (text "Email address optional"))
+      --  , showIf (model.appMode == UserValidation SignUpState) (el [ Font.size 12 ] (text "Email address optional"))
         , row [ spacing 12, paddingXY 0 12 ]
             [ showIf (model.appMode == UserValidation SignInState) (signInButton model)
             , row [ spacing 12 ]

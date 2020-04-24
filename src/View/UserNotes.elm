@@ -124,13 +124,14 @@ inputNewNoteName model =
       |> TextField.withHeight 30
       |> TextField.withWidth 365
       |> TextField.withLabelWidth 40
+      |> TextField.withLabelWidth 0
       |> renderTextField
 
 
 inputNoteTags model =
     TextField.make GotTagString model.tagString "Tags"
         |> TextField.withHeight 30
-        |> TextField.withWidth 365
+        |> TextField.withWidth 375
         |> TextField.withLabelWidth 40
         |> renderTextField
 
@@ -337,6 +338,7 @@ inputNoteNameFilter model =
     TextField.make GotNoteFilter model.noteFilterString ""
         |> TextField.withHeight 30
         |> TextField.withWidth 160
+        |> TextField.withLabelWidth 0
         |> renderTextField
 
 
@@ -345,6 +347,7 @@ inputTextFilter model =
       TextField.make GotTextFilter model.textFilterString ""
           |> TextField.withHeight 30
           |> TextField.withWidth 160
+          |> TextField.withLabelWidth 0
           |> renderTextField
 
 
