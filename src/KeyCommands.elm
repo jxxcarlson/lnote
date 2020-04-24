@@ -93,6 +93,13 @@ makeNewNoteUsingKey pressedKeys model =
     else
         model
 
+createNoteUsingKey : List Key -> Model -> Model
+createNoteUsingKey pressedKeys model =
+    if List.member (Character "N") pressedKeys then
+        Update.Helper.createNote_ model
+
+    else
+        model
 
 appModeOfKey : AppMode -> List Key -> AppMode
 appModeOfKey currentAppMode pressedKeys =

@@ -1,5 +1,5 @@
 
-module Update.Helper exposing(createNote, makeNewNote, editNote, newNote, selectNotes)
+module Update.Helper exposing(createNote, createNote_, createNoteCmd, makeNewNote, editNote, newNote, selectNotes)
 
 
 import Types exposing(FrontendModel,FrontendMsg, ToBackend(..), NotesMode(..), AppMode(..))
@@ -26,7 +26,27 @@ createNote model =
             , sendToBackend (CreateNote model.currentUser note)
             )
 
-        
+createNote_ : Model -> Model
+createNote_ model =
+    case newNote model of
+        Nothing ->
+            {model | maybeCurrentNote = Nothing}
+
+        Just note ->
+             { model
+                | maybeCurrentNote = Just note
+                , changedSubject = note.subject
+                , noteBody = note.body
+                , appMode = UserNotes EditingNote
+                , counter = model.counter + 1
+              }
+
+createNoteCmd : Model -> Cmd FrontendMsg
+createNoteCmd model =
+  case model.maybeCurrentNote of
+    Nothing -> Cmd.none
+    Just note ->
+       sendToBackend (CreateNote model.currentUser note)
 
 makeNewNote : Model -> Model
 makeNewNote model =
@@ -42,6 +62,7 @@ makeNewNote model =
         , tagString = ""
         , counter = model.counter + 1
     }
+
 
 
 editNote : Model -> Model
