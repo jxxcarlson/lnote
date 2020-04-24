@@ -26,6 +26,7 @@ createNote model =
             , sendToBackend (CreateNote model.currentUser note)
             )
 
+        
 
 makeNewNote : Model -> Model
 makeNewNote model =

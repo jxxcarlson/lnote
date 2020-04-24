@@ -218,7 +218,7 @@ update msg model =
                                 |> KC.toggleManualUsingKey pressedKeys
                                 |> KC.setBrowsingModeUsingKey pressedKeys
                                 |> KC.editNoteUsingKey pressedKeys
-                                |> KC.makeNewNoteUsingKey pressedKeys
+                                --|> KC.makeNewNoteUsingKey pressedKeys
                                 |> KC.sortIncreasingByDateUsingKey pressedKeys
                                 |> KC.sortDecreasingByDateUsingKey pressedKeys
                                 |> KC.sortIncreasingAlphabeticallyUsingKey pressedKeys
@@ -232,7 +232,6 @@ update msg model =
                         True ->
                             if List.member (Character "R") pressedKeys then
                                 Random.generate SelectRandomNotes (Utility.randomIntegers 10 (List.length model.notes))
-
                             else
                                 Cmd.none
             in

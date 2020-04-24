@@ -36,7 +36,7 @@ view model =
         [ showIf (Utility.currentUserIsAdmin model) (View.Button.adminMode model)
         , View.Button.userValidationMode model
         , View.Button.setNoteMode BrowsingNotes "Notes" model
-        , el [ centerX, Font.size 18, Font.color Style.white ] (text <| appTitle model)
+        -- , el [ centerX, Font.size 18, Font.color Style.white ] (text <| appTitle model)
         ]
 
 
